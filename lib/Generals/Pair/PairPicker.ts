@@ -106,18 +106,25 @@ export class PairPicker extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.menuOpen.subscribe(() => { this.requestUpdate(); });
-    this.filterText.subscribe(() => { this.requestUpdate(); });
+    this.menuOpen.subscribe(() => {
+      this.requestUpdate();
+    });
+    this.filterText.subscribe(() => {
+      this.requestUpdate();
+    });
 
     // Look for pair-data as descendant first, then via state-manager ancestor
-    const qr = this.querySelector('pair-data') ??
+    const qr =
+      this.querySelector('pair-data') ??
       this.closest('state-manager')?.querySelector('pair-data');
     if (qr) {
       if (DEBUG) {
         console.log('found data');
       }
       this.data = qr as PairData;
-      this.data.primaryFilter.subscribe(() => { this.requestUpdate(); });
+      this.data.primaryFilter.subscribe(() => {
+        this.requestUpdate();
+      });
     }
     if (this.data) {
       this.data.pairStore.subscribe(() => {
@@ -198,7 +205,9 @@ export class PairPicker extends LitElement {
             role="menuitemcheckbox"
             aria-checked="${itemSelected ? 'true' : 'false'}"
             aria-disabled="false"
-            @click=${() => { this.selectFiltered(primary, !itemSelected); }}
+            @click=${() => {
+              this.selectFiltered(primary, !itemSelected);
+            }}
             tabindex="0"
           >
             <iconify-icon
@@ -287,7 +296,9 @@ export class PairPicker extends LitElement {
           class="spectrum-Form spectrum-Form--labelsAbove spectrum-Form--sizeM"
           novalidate
           role="group"
-          @submit=${(e: Event) => { e.preventDefault(); }}
+          @submit=${(e: Event) => {
+            e.preventDefault();
+          }}
         >
           ${this.renderGeneralFilter()}
         </form>

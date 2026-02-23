@@ -188,7 +188,9 @@ export class GeneralStore {
     if (this.flushTimer) {
       clearTimeout(this.flushTimer);
     }
-    this.flushTimer = window.setTimeout(() => { this.flushBuffer(runId); }, 100);
+    this.flushTimer = window.setTimeout(() => {
+      this.flushBuffer(runId);
+    }, 100);
   }
 
   private flushBuffer(runId: number) {
@@ -302,7 +304,10 @@ export class GeneralStore {
 
     es.addEventListener('row', (e: MessageEvent) => {
       // Parse JSON data directly (PAGI::SSE sends plain JSON)
-      const msg = JSON.parse(e.data as string) as { runId: number; data: unknown };
+      const msg = JSON.parse(e.data as string) as {
+        runId: number;
+        data: unknown;
+      };
       if (DEBUG) {
         console.log('parsed row message:', msg);
       }

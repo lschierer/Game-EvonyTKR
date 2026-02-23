@@ -94,12 +94,22 @@ export class BuffFilter extends LitElement {
       }
 
       if (this.is_primary) {
-        this.data.ascendingLevel.subscribe(() => { this.requestUpdate(); });
-        this.data.generalLevel.subscribe(() => { this.requestUpdate(); });
-        this.data.victoryColumnLevel.subscribe(() => { this.requestUpdate(); });
+        this.data.ascendingLevel.subscribe(() => {
+          this.requestUpdate();
+        });
+        this.data.generalLevel.subscribe(() => {
+          this.requestUpdate();
+        });
+        this.data.victoryColumnLevel.subscribe(() => {
+          this.requestUpdate();
+        });
       }
-      this.data.covenantLevel.subscribe(() => { this.requestUpdate(); });
-      this.data.specialties.subscribe(() => { this.requestUpdate(); });
+      this.data.covenantLevel.subscribe(() => {
+        this.requestUpdate();
+      });
+      this.data.specialties.subscribe(() => {
+        this.requestUpdate();
+      });
 
       this.requestUpdate();
     } else if (DEBUG) {
@@ -386,42 +396,58 @@ export class BuffFilter extends LitElement {
       {
         key: 'ascendingLevel',
         get: () => data.ascendingLevel.state,
-        set: (v: string) => { data.ascendingLevel.setState(() => v); },
+        set: (v: string) => {
+          data.ascendingLevel.setState(() => v);
+        },
       },
       {
         key: 'covenantLevel',
         get: () => data.covenantLevel.state,
-        set: (v: string) => { data.covenantLevel.setState(() => v); },
+        set: (v: string) => {
+          data.covenantLevel.setState(() => v);
+        },
       },
       {
         key: 'generalLevel',
         get: () => String(data.generalLevel.state),
-        set: (v: string) => { data.generalLevel.setState(() => parseInt(v, 10) || 40); },
+        set: (v: string) => {
+          data.generalLevel.setState(() => parseInt(v, 10) || 40);
+        },
       },
       {
         key: 'victoryColumnLevel',
         get: () => String(data.victoryColumnLevel.state),
-        set: (v: string) => { data.victoryColumnLevel.setState(() => parseInt(v, 10) || 0); },
+        set: (v: string) => {
+          data.victoryColumnLevel.setState(() => parseInt(v, 10) || 0);
+        },
       },
       {
         key: 'specialty1',
         get: () => S.get(1),
-        set: (v: string) => { S.set(1, v as SpecialtyLevelValues); },
+        set: (v: string) => {
+          S.set(1, v as SpecialtyLevelValues);
+        },
       },
       {
         key: 'specialty2',
         get: () => S.get(2),
-        set: (v: string) => { S.set(2, v as SpecialtyLevelValues); },
+        set: (v: string) => {
+          S.set(2, v as SpecialtyLevelValues);
+        },
       },
       {
         key: 'specialty3',
         get: () => S.get(3),
-        set: (v: string) => { S.set(3, v as SpecialtyLevelValues); },
+        set: (v: string) => {
+          S.set(3, v as SpecialtyLevelValues);
+        },
       },
       {
         key: 'specialty4',
         get: () => S.get(4),
-        set: (v: string) => { S.set(4, v as SpecialtyLevelValues); },
+        set: (v: string) => {
+          S.set(4, v as SpecialtyLevelValues);
+        },
       },
     ] as ParamRow[];
   };
@@ -437,9 +463,8 @@ export class BuffFilter extends LitElement {
           class="spectrum-Form spectrum-Form--labelsAbove spectrum-Form--sizeM"
         >
           ${this.is_primary ? this.renderAscendingCombo() : ''}
-          ${this.renderCovenantCombo()}
-          ${this.renderGeneralLevelCombo()} ${this.renderVictoryColumnCombo()}
-          ${this.renderSpecialtyCombos()}
+          ${this.renderCovenantCombo()} ${this.renderGeneralLevelCombo()}
+          ${this.renderVictoryColumnCombo()} ${this.renderSpecialtyCombos()}
         </form>
       </div>
       <slot></slot>

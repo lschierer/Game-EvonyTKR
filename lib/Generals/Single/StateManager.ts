@@ -41,9 +41,13 @@ export class StateManager extends LitElement {
       this.data = qr as SingleData;
     }
     if (this.data) {
-      this.data.queryParams.subscribe(() => { this.scheduleRestart(); });
+      this.data.queryParams.subscribe(() => {
+        this.scheduleRestart();
+      });
 
-      this.data.generalStore.sessionId.subscribe(() => { this.scheduleRestart(); });
+      this.data.generalStore.sessionId.subscribe(() => {
+        this.scheduleRestart();
+      });
       let prevSelected = [...this.data.buffFilter.store.state.selected].sort();
       this.data.buffFilter.subscribe(() => {
         if (!this.data) return;
@@ -59,7 +63,9 @@ export class StateManager extends LitElement {
         if (current.length > prevSelected.length) {
           refresh = true;
         } else if (current.length === prevSelected.length) {
-          refresh = !current.every((value, index) => value === prevSelected[index]);
+          refresh = !current.every(
+            (value, index) => value === prevSelected[index],
+          );
         }
         prevSelected = current;
         if (refresh) {

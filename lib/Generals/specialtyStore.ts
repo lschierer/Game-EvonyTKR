@@ -32,9 +32,12 @@ function enforceSpecialtyConstraints(
 }
 
 export class SpecialtyStore {
-  readonly store: Store<SpecialtiesState> = new Store<SpecialtiesState>(
-    { s1: 'gold', s2: 'gold', s3: 'gold', s4: 'green' },
-  );
+  readonly store: Store<SpecialtiesState> = new Store<SpecialtiesState>({
+    s1: 'gold',
+    s2: 'gold',
+    s3: 'gold',
+    s4: 'green',
+  });
 
   subscribe(cb: () => void) {
     return this.store.subscribe(cb);

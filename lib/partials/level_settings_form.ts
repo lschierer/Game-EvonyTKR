@@ -12,7 +12,12 @@ import {
   type PropertyValues,
 } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
-import { type Signal, SignalWatcher, signal, computed } from '@lit-labs/signals';
+import {
+  type Signal,
+  SignalWatcher,
+  signal,
+  computed,
+} from '@lit-labs/signals';
 
 import {
   AscendingAttributeLevelNames,
@@ -47,7 +52,9 @@ interface GeneralOption {
 }
 
 @customElement('level-settings')
-export class LevelSettings extends (SignalWatcher(LitElement) as new () => LitElement) {
+export class LevelSettings extends (SignalWatcher(
+  LitElement,
+) as new () => LitElement) {
   static styles: CSSResultGroup = [
     SpectrumTokensCSS,
     SpectrumButton,
@@ -255,7 +262,9 @@ export class LevelSettings extends (SignalWatcher(LitElement) as new () => LitEl
                         <li
                           class="spectrum-Menu-item "
                           role="menuitem"
-                          @click=${() => { this.selectFiltered(true); }}
+                          @click=${() => {
+                            this.selectFiltered(true);
+                          }}
                           tabindex="0"
                         >
                           <span class="spectrum-Menu-itemLabel"
@@ -265,7 +274,9 @@ export class LevelSettings extends (SignalWatcher(LitElement) as new () => LitEl
                         <li
                           class="spectrum-Menu-item"
                           role="menuitem"
-                          @click=${() => { this.selectFiltered(false); }}
+                          @click=${() => {
+                            this.selectFiltered(false);
+                          }}
                           tabindex="0"
                         >
                           <span class="spectrum-Menu-itemLabel"
@@ -295,7 +306,9 @@ export class LevelSettings extends (SignalWatcher(LitElement) as new () => LitEl
                                   ? 'true'
                                   : 'false'}"
                                 tabindex=${index}
-                                @click=${() => { this.toggleByName(opt.name); }}
+                                @click=${() => {
+                                  this.toggleByName(opt.name);
+                                }}
                               >
                                 <iconify-icon
                                   icon="tabler:circle-check"
@@ -369,7 +382,6 @@ export class LevelSettings extends (SignalWatcher(LitElement) as new () => LitEl
               CovenantCategoryValues.values.values(),
               (value) => value,
               (value) => {
-
                 const selected = !this.covenantLevel.get().localeCompare(value);
 
                 return html`
@@ -528,8 +540,9 @@ export class LevelSettings extends (SignalWatcher(LitElement) as new () => LitEl
               id="specialty${i}"
               name="specialty${i}"
               class="spectrum-Picker spectrum-Picker--sizeM"
-              @change="${(e: Event) =>
-                { this.onSpecialtyChange(specialty, i, e.target); }}"
+              @change="${(e: Event) => {
+                this.onSpecialtyChange(specialty, i, e.target);
+              }}"
             >
               ${repeat(
                 SpecialtyLevelValues.values.values(),

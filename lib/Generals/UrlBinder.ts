@@ -1,5 +1,8 @@
 // urlBinder.ts
-type Readable<T> = { state: T; subscribe(cb: () => void): { unsubscribe: () => void } };
+type Readable<T> = {
+  state: T;
+  subscribe(cb: () => void): { unsubscribe: () => void };
+};
 
 export type ParamRow = {
   key: string;
@@ -24,7 +27,11 @@ export class UrlBinder {
 
     // Stores -> URL (debounced)
     for (const s of storesToWatch) {
-      this.unsub.push(s.subscribe(() => { this.queueWrite(); }));
+      this.unsub.push(
+        s.subscribe(() => {
+          this.queueWrite();
+        }),
+      );
     }
 
     // Back/forward support
@@ -38,7 +45,9 @@ export class UrlBinder {
     if (this.writeTimer) window.clearTimeout(this.writeTimer);
   }
 
-  private onPopstate = () => { this.applyFromUrl(); };
+  private onPopstate = () => {
+    this.applyFromUrl();
+  };
 
   private applyFromUrl() {
     this.applying = true;
@@ -58,10 +67,9 @@ export class UrlBinder {
     if (this.applying) return; // prevent feedback loop
     if (this.writing) return; // avoid re-entrancy during replaceState
     if (this.writeTimer) window.clearTimeout(this.writeTimer);
-    this.writeTimer = window.setTimeout(
-      () => { this.writeToUrl(); },
-      this.debounceMs,
-    );
+    this.writeTimer = window.setTimeout(() => {
+      this.writeToUrl();
+    }, this.debounceMs);
   }
 
   private writeToUrl() {

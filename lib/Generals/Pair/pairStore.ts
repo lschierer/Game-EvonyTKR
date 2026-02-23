@@ -106,7 +106,6 @@ export class PairStore {
   }
 
   public updateCatalog = async (selectedPrimaries: string[] = []) => {
-
     let path = window.location.pathname;
     path = path.replace('-comparison', '/data.json');
     const catalogUrl = new URL(path, window.location.toString());
@@ -213,7 +212,9 @@ export class PairStore {
     if (this.flushTimer) {
       clearTimeout(this.flushTimer);
     }
-    this.flushTimer = window.setTimeout(() => { this.flushBuffer(runId); }, 100);
+    this.flushTimer = window.setTimeout(() => {
+      this.flushBuffer(runId);
+    }, 100);
   }
 
   private flushBuffer(runId: number) {
@@ -329,7 +330,10 @@ export class PairStore {
 
     es.addEventListener('pair', (e: MessageEvent) => {
       // Parse JSON directly (PAGI::SSE sends plain JSON, not base64)
-      const msg = JSON.parse(e.data as string) as { runId: number; data: unknown };
+      const msg = JSON.parse(e.data as string) as {
+        runId: number;
+        data: unknown;
+      };
       if (DEBUG) {
         console.log('parsed pair message:', msg);
       }

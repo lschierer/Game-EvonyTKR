@@ -75,7 +75,9 @@ export class PairData extends LitElement {
       console.log(`version is ${PairData.VERSION}`);
     }
     this.ascendingLevel.subscribe(() => {
-      const valid = AscendingAttributeLevelValues.safeParse(this.ascendingLevel.state);
+      const valid = AscendingAttributeLevelValues.safeParse(
+        this.ascendingLevel.state,
+      );
       if (!valid.success) {
         if (DEBUG) console.error('invalid ascending level', valid.error);
         this.ascendingLevel.setState(() => this._prevAscendingLevel);
@@ -87,26 +89,37 @@ export class PairData extends LitElement {
       this.requestUpdate();
     });
     this.primaryCovenantLevel.subscribe(() => {
-      const valid = CovenantCategoryValues.safeParse(this.primaryCovenantLevel.state);
+      const valid = CovenantCategoryValues.safeParse(
+        this.primaryCovenantLevel.state,
+      );
       if (!valid.success) {
         if (DEBUG) console.error('invalid primary covenant level', valid.error);
-        this.primaryCovenantLevel.setState(() => this._prevPrimaryCovenantLevel);
+        this.primaryCovenantLevel.setState(
+          () => this._prevPrimaryCovenantLevel,
+        );
         return;
       }
       this._prevPrimaryCovenantLevel = this.primaryCovenantLevel.state;
-      if (DEBUG) console.log(`Primary CovenantCategory validated at ${valid.data}`);
+      if (DEBUG)
+        console.log(`Primary CovenantCategory validated at ${valid.data}`);
       this.updateFilterParams();
       this.requestUpdate();
     });
     this.secondaryCovenantLevel.subscribe(() => {
-      const valid = CovenantCategoryValues.safeParse(this.secondaryCovenantLevel.state);
+      const valid = CovenantCategoryValues.safeParse(
+        this.secondaryCovenantLevel.state,
+      );
       if (!valid.success) {
-        if (DEBUG) console.error('invalid secondary covenant level', valid.error);
-        this.secondaryCovenantLevel.setState(() => this._prevSecondaryCovenantLevel);
+        if (DEBUG)
+          console.error('invalid secondary covenant level', valid.error);
+        this.secondaryCovenantLevel.setState(
+          () => this._prevSecondaryCovenantLevel,
+        );
         return;
       }
       this._prevSecondaryCovenantLevel = this.secondaryCovenantLevel.state;
-      if (DEBUG) console.log(`Secondary CovenantCategory validated at ${valid.data}`);
+      if (DEBUG)
+        console.log(`Secondary CovenantCategory validated at ${valid.data}`);
       this.updateFilterParams();
       this.requestUpdate();
     });
@@ -142,8 +155,12 @@ export class PairData extends LitElement {
       this.updateFilterParams();
       this.requestUpdate();
     });
-    this.pairStore.subscribe(() => { this.requestUpdate(); });
-    this.primaryFilter.subscribe(() => { this.requestUpdate(); });
+    this.pairStore.subscribe(() => {
+      this.requestUpdate();
+    });
+    this.primaryFilter.subscribe(() => {
+      this.requestUpdate();
+    });
   }
 
   public updateFilterParams() {

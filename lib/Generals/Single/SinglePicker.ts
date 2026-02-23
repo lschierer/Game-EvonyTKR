@@ -106,8 +106,12 @@ export class GeneralPicker extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.menuOpen.subscribe(() => { this.requestUpdate(); });
-    this.filterText.subscribe(() => { this.requestUpdate(); });
+    this.menuOpen.subscribe(() => {
+      this.requestUpdate();
+    });
+    this.filterText.subscribe(() => {
+      this.requestUpdate();
+    });
 
     const qr = this.querySelector('single-data');
     if (qr) {
@@ -115,7 +119,9 @@ export class GeneralPicker extends LitElement {
         console.log('found data');
       }
       this.data = qr as SingleData;
-      this.data.buffFilter.subscribe(() => { this.requestUpdate(); });
+      this.data.buffFilter.subscribe(() => {
+        this.requestUpdate();
+      });
     }
     if (this.data) {
       this.data.generalStore.subscribe(() => {
@@ -196,7 +202,9 @@ export class GeneralPicker extends LitElement {
             role="menuitemcheckbox"
             aria-checked="${itemSelected ? 'true' : 'false'}"
             aria-disabled="false"
-            @click=${() => { this.selectFiltered(primary, !itemSelected); }}
+            @click=${() => {
+              this.selectFiltered(primary, !itemSelected);
+            }}
             tabindex="0"
           >
             <iconify-icon
@@ -285,7 +293,9 @@ export class GeneralPicker extends LitElement {
           class="spectrum-Form spectrum-Form--labelsAbove spectrum-Form--sizeM"
           novalidate
           role="group"
-          @submit=${(e: Event) => { e.preventDefault(); }}
+          @submit=${(e: Event) => {
+            e.preventDefault();
+          }}
         >
           ${this.renderGeneralFilter()}
         </form>

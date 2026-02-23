@@ -68,7 +68,9 @@ export class SingleData extends LitElement {
       console.log(`version is ${SingleData.VERSION}`);
     }
     this.ascendingLevel.subscribe(() => {
-      const valid = AscendingAttributeLevelValues.safeParse(this.ascendingLevel.state);
+      const valid = AscendingAttributeLevelValues.safeParse(
+        this.ascendingLevel.state,
+      );
       if (!valid.success) {
         if (DEBUG) console.error('invalid ascending level', valid.error);
         this.ascendingLevel.setState(() => this._prevAscendingLevel);
@@ -121,8 +123,12 @@ export class SingleData extends LitElement {
       this.requestUpdate();
     });
 
-    this.generalStore.subscribe(() => { this.requestUpdate(); });
-    this.buffFilter.subscribe(() => { this.requestUpdate(); });
+    this.generalStore.subscribe(() => {
+      this.requestUpdate();
+    });
+    this.buffFilter.subscribe(() => {
+      this.requestUpdate();
+    });
   }
 
   public updateFilterParams() {

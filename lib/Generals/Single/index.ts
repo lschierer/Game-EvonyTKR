@@ -6,4 +6,3 @@ export { GeneralPicker as _PairPicker } from './SinglePicker';
 export { GeneralStore as _PairStore } from './singleStore';
 export { SingleTable as _PairTable } from './SingleTable';
 export { StateManager as _StateManager } from './StateManager';
-

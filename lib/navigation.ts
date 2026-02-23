@@ -8,10 +8,10 @@ document.addEventListener('DOMContentLoaded', () => {
       .querySelectorAll('.spectrum-TreeView-item')
       .forEach((item) => {
         const chevron = item.querySelector<HTMLElement>(
-          ':scope > .spectrum-TreeView-itemLink > .spectrum-TreeView-itemIndicator'
+          ':scope > .spectrum-TreeView-itemLink > .spectrum-TreeView-itemIndicator',
         );
         const childList = item.querySelector<HTMLElement>(
-          ':scope > .spectrum-TreeView'
+          ':scope > .spectrum-TreeView',
         );
 
         if (chevron && childList) {

@@ -43,13 +43,21 @@ export class StateManager extends LitElement {
       this.data = qr as PairData;
     }
     if (this.data) {
-      this.data.queryParams.subscribe(() => { this.scheduleRestart(); });
+      this.data.queryParams.subscribe(() => {
+        this.scheduleRestart();
+      });
 
-      this.data.pairStore.sessionId.subscribe(() => { this.scheduleRestart(); });
-      let prevSelected = [...this.data.primaryFilter.store.state.selected].sort();
+      this.data.pairStore.sessionId.subscribe(() => {
+        this.scheduleRestart();
+      });
+      let prevSelected = [
+        ...this.data.primaryFilter.store.state.selected,
+      ].sort();
       this.data.primaryFilter.subscribe(() => {
         if (!this.data) return;
-        const current = [...this.data.primaryFilter.store.state.selected].sort();
+        const current = [
+          ...this.data.primaryFilter.store.state.selected,
+        ].sort();
 
         let refresh: boolean = false;
         // if there are *less* rows, the change to the ignore state will be
@@ -61,7 +69,9 @@ export class StateManager extends LitElement {
         if (current.length > prevSelected.length) {
           refresh = true;
         } else if (current.length === prevSelected.length) {
-          refresh = !current.every((value, index) => value === prevSelected[index]);
+          refresh = !current.every(
+            (value, index) => value === prevSelected[index],
+          );
         }
         prevSelected = current;
         if (refresh) {
