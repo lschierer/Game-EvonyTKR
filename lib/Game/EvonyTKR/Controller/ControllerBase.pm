@@ -42,6 +42,9 @@ sub getConstants {
 sub build ($self) {
   $self->logger->debug("ControllerBase build");
 
+  # Call parent build (registers /robots.txt from WebFramework::Controller::Base)
+  $self->SUPER::build();
+
   # Register common routes that all controllers need
   $self->_register_common_routes();
 }
@@ -58,29 +61,6 @@ sub _register_common_routes ($self) {
         my $xml = $self->generate_sitemap_xml();
         $ctx->res->headers(content_type => 'application/xml; charset=utf-8');
         return $xml;
-      },
-      action => 'http.*',
-    }
-  );
-
-  # Robots.txt route
-  $router->add(
-    '/robots.txt',
-    {
-      to => sub ($self, $ctx) {
-        my $host   = $ctx->req->headers->{'host'} // '';
-        my $is_dev = $host =~ /dev|localhost|127\.0\.0\.1/i;
-
-        my $base   = $ctx->req->scheme . '://' . $ctx->req->host . '/';
-        my $robots =
-          $is_dev
-          ? "User-agent: *\nDisallow: /\n"
-          : "User-agent: *\nDisallow:\nSitemap: "
-          . $base
-          . "sitemap.xml\n";
-
-        $ctx->res->headers(content_type => 'text/plain');
-        return $robots;
       },
       action => 'http.*',
     }
