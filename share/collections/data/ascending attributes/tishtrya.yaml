@@ -1,0 +1,79 @@
+general: Tishtrya
+id: Tishtrya
+ascending:
+  - level: red1
+    text: Attacking Mounted Troop Attack +15%, Defense and HP +5%
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 15
+      - attribute: Defense
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 5
+      - attribute: HP
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 5
+  - level: red2
+    text: Attacking Troop Death into Wounded +8%
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Attacking
+        passive: 0
+        value:
+          number: 8
+          unit: percentage
+  - level: red3
+    text: When attacking, Mounted Troop Attack +30%, March Size Capacity +5%
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 30
+      - attribute: March Size
+        value:
+          number: 5
+  - level: red4
+    text: Attacking Mounted Troop Defense and HP +20%
+    buffs:
+      - attribute: Defense
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 20
+      - attribute: HP
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 20 
+  - level: red5
+    text: Attacking Mounted Troop Attack and Defense +45%, March Size Capacity +10%
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 45
+      - attribute: Defense
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 45
+      - attribute: March Size
+        value:
+          number: 10

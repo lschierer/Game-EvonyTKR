@@ -1,0 +1,26 @@
+name: Tishtar Yasht
+text: >-
+  Increases mounted troops' attack and HP by 60%, and ground troops and mounted troops' defense by 40% when general is leading the army to attack.
+buffs:
+  - attribute: Attack
+    troop: Mounted Troops
+    value:
+      number: 60
+  - attribute: HP
+    troop: Mounted Troops
+    value:
+      number: 60
+  - attribute: Defense
+    troop: Mounted Troops
+    conditions:
+      - leading the army
+      - Attacking
+    value:
+      number: 40
+  - attribute: Defense
+    troop: Ground Troops
+    conditions:
+      - leading the army
+      - Attacking
+    value:
+      number: 40

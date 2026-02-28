@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 137
+    increment: 9.61
+  defense:
+    base: 120
+    increment: 8.71
+  leadership:
+    base: 127
+    increment: 9.07
+  politics:
+    base: 120
+    increment: 7.95
+book: Tishtar Yasht
+specialties:
+  - Mounted Troop Assault
+  - Formation
+  - Mounted Troop Ares
+  - Radiant Star
+stars: red5
+type:
+  - mounted_specialist
+general: Tishtrya
+name: Tishtrya
