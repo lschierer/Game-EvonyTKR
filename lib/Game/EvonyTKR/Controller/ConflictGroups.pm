@@ -1,4 +1,5 @@
 use v5.42.0;
+# cspell: disable
 use utf8::all;
 use File::FindLib 'lib';
 use namespace::autoclean;

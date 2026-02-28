@@ -1,5 +1,6 @@
 use v5.42.0;
 use utf8::all;
+# cspell: disable
 use File::FindLib 'lib';
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::Data;

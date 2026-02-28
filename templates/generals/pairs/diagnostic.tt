@@ -1,7 +1,7 @@
 [% WRAPPER layouts/default.tt %]
 
 <div class="diagnostic-container">
-  <h1>Pairs Diagnostic: [% diagnostic.type %]</h1>
+  <h1>Conflicts Diagnostic: [% diagnostic.type %]</h1>
 
   <section class="stats">
     <h2>Statistics</h2>
@@ -11,37 +11,17 @@
         <td>'[% diagnostic.type %]'</td>
       </tr>
       <tr>
-        <th>Pairs for this type</th>
-        <td>[% diagnostic.pair_count %]</td>
+        <th>Generals of this type</th>
+        <td>[% diagnostic.type_generals.size %]</td>
       </tr>
       <tr>
-        <th>Total pairs (all types)</th>
-        <td>[% diagnostic.total_pairs %]</td>
+        <th>Conflicts for this type</th>
+        <td>[% diagnostic.conflict_count %]</td>
       </tr>
       <tr>
-        <th>Conflicts filtered</th>
-        <td>[% diagnostic.conflicts_filtered %]</td>
+        <th>Total conflicts (all types)</th>
+        <td>[% diagnostic.total_conflicts %]</td>
       </tr>
-    </table>
-  </section>
-
-  <section class="type-breakdown">
-    <h2>Pairs by Type</h2>
-    <table class="diagnostic-table">
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Count</th>
-        </tr>
-      </thead>
-      <tbody>
-        [% FOREACH type_key IN diagnostic.pairs_by_type.keys.sort %]
-        <tr>
-          <td>[% type_key %]</td>
-          <td>[% diagnostic.pairs_by_type.$type_key %]</td>
-        </tr>
-        [% END %]
-      </tbody>
     </table>
   </section>
 
@@ -54,27 +34,27 @@
     </ul>
   </section>
 
-  <section class="sample-pairs">
-    <h2>Sample Pairs (first 10)</h2>
-    [% IF diagnostic.sample_pairs.size %]
+  <section class="all-conflicts">
+    <h2>All Conflicts ([% diagnostic.conflict_count %] total)</h2>
+    [% IF diagnostic.all_conflicts.size %]
     <table class="diagnostic-table">
       <thead>
         <tr>
           <th>Primary</th>
-          <th>Secondary</th>
+          <th>Secondary (Conflicts With)</th>
         </tr>
       </thead>
       <tbody>
-        [% FOREACH pair IN diagnostic.sample_pairs %]
+        [% FOREACH conflict IN diagnostic.all_conflicts %]
         <tr>
-          <td>[% pair.primary %]</td>
-          <td>[% pair.secondary %]</td>
+          <td>[% conflict.primary %]</td>
+          <td>[% conflict.secondary %]</td>
         </tr>
         [% END %]
       </tbody>
     </table>
     [% ELSE %]
-    <p>No pairs found for this type.</p>
+    <p>No conflicts found for this type.</p>
     [% END %]
   </section>
 </div>

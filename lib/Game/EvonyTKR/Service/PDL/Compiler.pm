@@ -587,10 +587,17 @@ sub _buff_applies ($self, $buff, $activation_type, $troop_type) {
 
   # Map activation types to condition keywords
   my %activation_map = (
-    'Attacking' => ['Attacking', 'Marching', 'Attack'],
-    'PvM'       => ['monsters',  'PvM',      'Against Monsters'],
-    'Mayor'     => ['Mayor',     'Wall'],
-    'Defending' => ['Defending', 'Defense'],
+    'Attacking'    => ['Attacking', 'Marching', 'Attack', 'Leading'],
+    'PvM'          => ['Attacking', 'Marching', 'Attack', 'Leading', 'Monsters', 'PvM', 'Against Monsters'],
+    'Overall'      => ['Attacking', 'Marching', 'Attack', 'Leading'],
+    'Mayor'        => ['Mayor',     'Wall'],
+    'Defending'    => ['Defending', 'Defense'],
+    'Reinforcing'  => ['Reinforcing'],
+    'Defense'      => ['Defending', 'Defense'],
+    'In City'      => ['Defending', 'Defense'],
+    'Out City'     => ['Attacking', 'Marching', 'Attack', 'Leading'],
+    'Wall'         => ['Wall'],
+    'Officer'      => ['Officer'],
   );
 
   my $keywords = $activation_map{$activation_type} || [];
@@ -599,13 +606,6 @@ sub _buff_applies ($self, $buff, $activation_type, $troop_type) {
   for my $keyword (@$keywords) {
     for my $condition (@non_debuff_conditions) {
       return 1 if lc($condition) =~ /\Q\L$keyword\E/;
-    }
-  }
-
-# Special case: if activation is 'Attacking', also check for 'leading' condition
-  if ($activation_type eq 'Attacking') {
-    for my $condition (@non_debuff_conditions) {
-      return 1 if lc($condition) =~ /leading/;
     }
   }
 

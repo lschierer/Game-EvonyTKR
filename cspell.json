@@ -4,7 +4,7 @@
   "language": "en-US",
   "caseSensitive": true,
   "dictionaries": ["en-us", "project-words", "user-words"],
-  "enabledLanguageIds": ["markdown", "plaintext"],
+  "enabledLanguageIds": ["markdown", "plaintext", "yaml"],
   "dictionaryDefinitions": [
     {
       "name": "project-words",

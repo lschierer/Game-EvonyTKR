@@ -1,5 +1,6 @@
 use v5.42.0;
 use utf8::all;
+#cspell: disable
 use File::FindLib 'lib';
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::Data;
@@ -266,41 +267,67 @@ qr/(?:ground_specialist|mounted_specialist|ranged_specialist|siege_specialist|ma
     return $self->template('generals/pairs/GeneralTablePair.tt', $vars);
   }
 
-  # Diagnostic endpoint for viewing pairs by type
+  # Diagnostic endpoint for viewing conflicts by type
   sub diagnostic_pairs_by_type ($self, $ctx, $type) {
-    $self->logger->debug("Diagnostic: pairs for type $type");
+    $self->logger->debug("Diagnostic: conflicts for type $type");
 
-    my $pairs_loader = $self->pairs_loader();
-    unless ($pairs_loader) {
-      return $self->render_error($ctx, 500, "Pairs data not loaded");
+    my $conflicts_loader = $self->conflicts_loader();
+    unless ($conflicts_loader) {
+      return $self->render_error($ctx, 500, "Conflicts data not loaded");
     }
 
-    # Get pairs for the requested type
-    my $pairs      = $pairs_loader->get_pairs_for_type($type);
-    my $pair_count = scalar(@$pairs);
+    my $generals_loader = $self->generals_loader();
+    unless ($generals_loader) {
+      return $self->render_error($ctx, 500, "Generals data not loaded");
+    }
 
-    # Get stats
-    my $stats = $pairs_loader->stats;
+    # Get all generals of this type
+    my @type_generals;
+    foreach my $general_key ($generals_loader->list_generals->@*) {
+      my $general = $generals_loader->get_general($general_key);
+      next unless $general;
+      my $general_types = $general->type // [];
+      $general_types = [$general_types] unless ref($general_types) eq 'ARRAY';
+      my $matches = grep { lc($_) eq lc($type) } @$general_types;
+      push @type_generals, $general->name if $matches;
+    }
 
-    # Build diagnostic info
+    # Find all conflicts where primary is of this type
+    my @conflicts;
+    foreach my $primary (@type_generals) {
+      my $conflicts_for = $conflicts_loader->get_conflicts_for($primary);
+      foreach my $secondary (keys %$conflicts_for) {
+        next unless $conflicts_for->{$secondary}; # Only conflicts, not compatible
+        # Get display name for secondary
+        my $sec_general = $generals_loader->get_general($secondary);
+        push @conflicts, {
+          primary   => $primary,
+          secondary => $sec_general ? $sec_general->name : $secondary,
+        };
+      }
+    }
+
+    my $pairs_loader = $self->pairs_loader();
+    my $stats = $pairs_loader ? $pairs_loader->stats : {};
+
+    my @sorted_conflicts = sort { 
+      my $p = $a->{primary} cmp $b->{primary};
+      return $p if $p;
+      return $a->{secondary} cmp $b->{secondary};
+    } @conflicts;
+
     my $diagnostic = {
       type               => $type,
-      pair_count         => $pair_count,
-      total_pairs        => $stats->{total_pairs},
-      conflicts_filtered => $stats->{conflicts_found},
-      pairs_by_type      => $stats->{pairs_by_type},
-      available_types    => $pairs_loader->list_types,
-      sample_pairs       => [
-        map { {
-          primary   => $_->{primary}{name},
-          secondary => $_->{secondary}{name}
-        } } @$pairs[0 .. min(9, $#$pairs)]
-      ],
+      conflict_count     => scalar(@conflicts),
+      total_conflicts    => $conflicts_loader->conflict_count,
+      available_types    => $pairs_loader ? $pairs_loader->list_types : [],
+      all_conflicts      => \@sorted_conflicts,
+      type_generals      => \@type_generals,
     };
 
     my $vars = {
       diagnostic   => $diagnostic,
-      title        => "Pairs Diagnostic - $type",
+      title        => "Conflicts Diagnostic - $type",
       current_year => (localtime)[5] + 1900,
       css_files    => ['/css/GeneralPairsIndex.css'],
       sidebar      => 1,
