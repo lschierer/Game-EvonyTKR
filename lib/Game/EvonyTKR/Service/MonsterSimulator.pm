@@ -7,6 +7,7 @@ with 'Game::EvonyTKR::Role::Common';
 with 'Game::EvonyTKR::Role::Constants::MonsterConstants';
 
 use experimental qw(signatures);
+use POSIX qw(ceil);
 
 has monsters_loader => (
   is       => 'ro',
@@ -147,30 +148,68 @@ sub simulate ($self, $params) {
   my $monster_defense = $monster->defense * (1 - $monster_defense_debuff);
   my $monster_hp      = $monster->hp;
 
-  # Calculate damage output
-  # This is a simplified damage formula - the actual game formula may vary
-  my $damage_per_troop = $player_attack * $troop_modifier;
+  # Calculate damage per troop
+  # Formula: troop_modifier * player_attack * (player_attack / (player_attack + monster_defense))
+  my $damage_per_troop = $troop_modifier * $player_attack
+    * ($player_attack / ($player_attack + $monster_defense));
 
-  # Account for monster defense reducing damage
-  my $effective_damage =
-    $damage_per_troop * ($player_attack / ($player_attack + $monster_defense));
+  my $spawn_count = $monster->troop_count // 1;
 
-  # Calculate minimum troops to kill (simplified)
+  # Minimum troops to kill: monster_hp * spawn_count / damage_per_troop
   my $min_troops_to_kill = 0;
-  if ($effective_damage > 0 && $monster->troop_count) {
-    $min_troops_to_kill =
-      int(($monster_hp * $monster->troop_count) / $effective_damage) + 1;
+  if ($damage_per_troop > 0 && $spawn_count) {
+    $min_troops_to_kill = ceil($monster_hp * $spawn_count / $damage_per_troop);
   }
 
-  # Calculate expected wounds (simplified)
-  # Wounds depend on monster attack vs player defense/hp
-  my $monster_damage_per_troop = $monster_attack / $troop_count
-    if $troop_count > 0;
-  my $expected_wounds = 0;
+  # Monster effective HP for the entire fight
+  my $monster_ehp = $monster_hp * $spawn_count;
+
+  # Wounds per turn: monster_troop_mod * monster_attack * (monster_attack / (monster_attack + player_defense)) / player_hp
+  my $monster_troop_mod = $monster->get_troop_modifier($troop_type);
+  my $wounds_per_turn = 0;
   if ($player_hp > 0 && $monster_attack > 0) {
-    $expected_wounds =
-      int(($monster_attack * $monster->troop_count) / $player_hp);
+    $wounds_per_turn = $monster_troop_mod * $monster_attack
+      * ($monster_attack / ($monster_attack + $player_defense))
+      / $player_hp;
   }
+
+  # Initial wounded (10% normally, 0.8% for orders 186-189)
+  my $order = $monster->order;
+  my $initial_wounded = ($order > 185 && $order < 190)
+    ? ceil($troop_count * 0.008)
+    : ceil($troop_count * 0.1);
+
+  # Turn-based simulation
+  my $troops_remaining = $troop_count - $initial_wounded;
+  my $total_wounds     = $initial_wounded;
+  my $total_damage     = 0;
+  my $remaining_ehp    = $monster_ehp;
+  my $combat_turns     = 0;
+  my $max_turns        = 1000;
+
+  while ($remaining_ehp > 0 && $troops_remaining > 0 && $combat_turns < $max_turns) {
+    $combat_turns++;
+
+    # Player deals damage: remaining troops * damage_per_troop (capped at remaining EHP)
+    my $turn_damage = $troops_remaining * $damage_per_troop;
+    if ($turn_damage > $remaining_ehp) {
+      $turn_damage = $remaining_ehp;
+    }
+    $total_damage   += $turn_damage;
+    $remaining_ehp  -= $turn_damage;
+
+    # Monster wounds troops (only if monster is still alive)
+    if ($remaining_ehp > 0) {
+      my $turn_wounds = ceil($troops_remaining * $wounds_per_turn);
+      if ($turn_wounds > $troops_remaining) {
+        $turn_wounds = $troops_remaining;
+      }
+      $total_wounds    += $turn_wounds;
+      $troops_remaining -= $turn_wounds;
+    }
+  }
+
+  my $troops_surviving = $troop_count - $total_wounds;
 
   return {
     # Input summary
@@ -204,9 +243,11 @@ sub simulate ($self, $params) {
     # Calculation results
     troop_modifier     => sprintf('%.4f', $troop_modifier),
     damage_per_troop   => sprintf('%.2f', $damage_per_troop),
-    effective_damage   => sprintf('%.2f', $effective_damage),
     min_troops_to_kill => $min_troops_to_kill,
-    expected_wounds    => $expected_wounds,
+    expected_wounds    => $total_wounds,
+    initial_wounded    => $initial_wounded,
+    combat_turns       => $combat_turns,
+    troops_surviving   => $troops_surviving,
 
     # Uncertainty tracking
     unknowns_count => $params->{unknowns_count} // 0,

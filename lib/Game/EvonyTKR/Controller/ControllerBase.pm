@@ -152,6 +152,14 @@ sub render_error ($self, $ctx, $status, $message) {
 sub template ($self, $template_name, $vars = {}) {
   # Add is_production to all template renders
   $vars->{is_production} //= ($self->app->env // '') eq 'production';
+
+  # Provide format_number as a template function
+  $vars->{format_number} //= sub {
+    my $num = shift // 0;
+    $num =~ s/(\d)(?=(\d{3})+(?!\d))/$1,/g;
+    return $num;
+  };
+
   return $self->SUPER::template($template_name, $vars);
 }
 

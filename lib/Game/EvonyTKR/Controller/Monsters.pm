@@ -2,6 +2,7 @@ package Game::EvonyTKR::Controller::Monsters;
 use v5.42.0;
 use utf8::all;
 use Mooish::Base -standard;
+use Future::AsyncAwait;
 extends 'Game::EvonyTKR::Controller::ControllerBase';
 
 with 'Game::EvonyTKR::Role::Constants::MonsterConstants';
@@ -76,15 +77,22 @@ sub build ($self) {
   );
 
   # API endpoint for monster levels by name (AJAX)
-  $self->router->add(
-    "$base/api/monster-levels/:name",
-    {
-      to => sub ($self, $ctx) {
-        return $self->api_monster_levels($ctx);
-      },
-      action => 'http.GET',
+  # Register explicit routes for each known monster name to avoid
+  # percent-encoding issues with spaces in :name path parameters.
+  my $monsters_loader = $self->monsters_loader();
+  if ($monsters_loader) {
+    for my $name ($monsters_loader->list_unique_names()->@*) {
+      $self->router->add(
+        "$base/api/monster-levels/$name",
+        {
+          to => sub ($self, $ctx) {
+            return $self->_monster_levels_response($ctx, $name);
+          },
+          action => 'http.GET',
+        }
+      );
     }
-  );
+  }
 
   $self->logger->info("Registered MonsterSimulator routes");
 }
@@ -102,6 +110,16 @@ sub index ($self, $ctx) {
   my $monster_names = $monsters_loader->list_unique_names();
   my $boss_monsters = $monsters_loader->list_boss_monsters();
 
+  # Build base stats JSON for calibration modal
+  my $monster_simulator_data = $self->monster_simulator_data();
+  use JSON::MaybeXS;
+  my $json = JSON::MaybeXS->new(utf8 => 0);
+  my $base_stats_json = $json->encode({
+    attack  => $monster_simulator_data->troop_base_attack,
+    defense => $monster_simulator_data->troop_base_defense,
+    hp      => $monster_simulator_data->troop_base_hp,
+  });
+
   my $vars = {
     monster_names     => $monster_names,
     boss_monsters     => $boss_monsters,
@@ -117,6 +135,7 @@ sub index ($self, $ctx) {
     navigation        => $self->render_navigation($ctx->req->path),
     site_logo         => $self->site_logo(),
     css_files         => ['/css/monsterSimulator.css'],
+    base_stats_json   => $base_stats_json,
 
     # Default values for form
     defaults => {
@@ -130,7 +149,7 @@ sub index ($self, $ctx) {
   return $self->template('monster_simulator/index.tt', $vars);
 }
 
-sub calculate ($self, $ctx) {
+async sub calculate ($self, $ctx) {
   $self->logger->debug("Processing monster simulation");
 
   my $monsters_loader        = $self->monsters_loader();
@@ -141,7 +160,8 @@ sub calculate ($self, $ctx) {
   }
 
   # Parse form parameters
-  my $params = $ctx->req->params->to_hash;
+  my $form   = await $ctx->req->form_params;
+  my $params = $form->as_hashref;
 
   my $monster_order = $params->{monster_order};
   my $tier          = $params->{tier}        // 'T15';
@@ -176,6 +196,17 @@ sub calculate ($self, $ctx) {
       flat    => $params->{hp_flat} // 0,
     },
   };
+
+  # Handle direct-entry buff totals: if user typed a total but category
+  # breakdowns are all zero, use the total as the basic category
+  for my $stat (qw(attack defense hp)) {
+    my $total_from_form = ($params->{"total_${stat}"} // 0) / 100;
+    my $category_sum = $buffs->{$stat}{basic} + $buffs->{$stat}{march}
+      + $buffs->{$stat}{monster} + $buffs->{$stat}{misc} + $buffs->{$stat}{rally};
+    if ($total_from_form > 0 && $category_sum == 0) {
+      $buffs->{$stat}{basic} = $total_from_form;
+    }
+  }
 
   # Parse debuffs
   my $debuffs = {
@@ -253,7 +284,7 @@ sub api_monsters ($self, $ctx) {
     return '{"error": "Monster data not loaded"}';
   }
 
-  my $query = $ctx->req->params->param('q') // '';
+  my $query = $ctx->req->query_param('q') // '';
 
   my $results;
   if ($query) {
@@ -270,15 +301,13 @@ sub api_monsters ($self, $ctx) {
   return $json->encode($results);
 }
 
-sub api_monster_levels ($self, $ctx) {
+sub _monster_levels_response ($self, $ctx, $name) {
   my $monsters_loader = $self->monsters_loader();
 
   unless ($monsters_loader) {
     $ctx->res->headers(content_type => 'application/json');
     return '{"error": "Monster data not loaded"}';
   }
-
-  my $name = $ctx->captures->{name} // '';
 
   my $levels = $monsters_loader->get_levels_for_name($name);
 

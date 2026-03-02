@@ -93,13 +93,20 @@
     <section class="form-section">
       <h2 class="spectrum-Heading spectrum-Heading--sizeL">Your Buffs</h2>
       <p class="spectrum-Body spectrum-Body--sizeS">
-        Click "Calculate" to enter buff values from each source. Unknown sources are automatically tracked.
+        Enter your total buff percentages directly (from Monarch Details), or click "Calculate" to enter values from each source.
+        You can also click "Calibrate from Stats" to reverse-calculate percentages from per-troop stats shown in march details.
       </p>
+
+      <div style="margin-bottom: 0.75rem;">
+        <button type="button" class="spectrum-Button spectrum-Button--sizeS spectrum-Button--secondary" onclick="openCalibrationModal()">
+          <span class="spectrum-Button-label">Calibrate from Stats</span>
+        </button>
+      </div>
 
       <div class="buff-summary">
         <div class="buff-row">
           <label class="buff-label">Attack %</label>
-          <input type="number" id="total_attack" name="total_attack" class="spectrum-Textfield-input buff-total" value="0" step="0.1" readonly>
+          <input type="number" id="total_attack" name="total_attack" class="spectrum-Textfield-input buff-total" value="0" step="0.01" onchange="syncBuffTotal('attack')">
           <button type="button" class="spectrum-Button spectrum-Button--sizeS spectrum-Button--secondary" onclick="openBuffCalculator('attack')">
             <span class="spectrum-Button-label">Calculate</span>
           </button>
@@ -107,7 +114,7 @@
         </div>
         <div class="buff-row">
           <label class="buff-label">Defense %</label>
-          <input type="number" id="total_defense" name="total_defense" class="spectrum-Textfield-input buff-total" value="0" step="0.1" readonly>
+          <input type="number" id="total_defense" name="total_defense" class="spectrum-Textfield-input buff-total" value="0" step="0.01" onchange="syncBuffTotal('defense')">
           <button type="button" class="spectrum-Button spectrum-Button--sizeS spectrum-Button--secondary" onclick="openBuffCalculator('defense')">
             <span class="spectrum-Button-label">Calculate</span>
           </button>
@@ -115,7 +122,7 @@
         </div>
         <div class="buff-row">
           <label class="buff-label">HP %</label>
-          <input type="number" id="total_hp" name="total_hp" class="spectrum-Textfield-input buff-total" value="0" step="0.1" readonly>
+          <input type="number" id="total_hp" name="total_hp" class="spectrum-Textfield-input buff-total" value="0" step="0.01" onchange="syncBuffTotal('hp')">
           <button type="button" class="spectrum-Button spectrum-Button--sizeS spectrum-Button--secondary" onclick="openBuffCalculator('hp')">
             <span class="spectrum-Button-label">Calculate</span>
           </button>
@@ -395,6 +402,57 @@
   </div>
 </div>
 
+<!-- Calibration Modal -->
+<div id="calibrationModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="spectrum-Heading spectrum-Heading--sizeM">Calibrate Buffs from Per-Troop Stats</h3>
+      <button type="button" class="modal-close" onclick="closeCalibrationModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="spectrum-Body spectrum-Body--sizeS" style="margin-bottom: 1rem;">
+        Enter your per-troop stats from the battle report or march details screen.
+        The buff percentage will be calculated automatically using the base stats for
+        your selected tier and troop type.
+      </p>
+
+      <div class="calibration-info" id="calibration-info" style="margin-bottom: 1rem; padding: 0.5rem; background: var(--spectrum-alias-background-color-gray-75, #f5f5f5); border-radius: 4px;">
+        <strong>Tier:</strong> <span id="cal-tier">--</span> &nbsp;
+        <strong>Troop Type:</strong> <span id="cal-troop-type">--</span>
+      </div>
+
+      <div class="buff-sources">
+        <div class="source-group">
+          <h4>Observed Attack per Troop</h4>
+          <input type="number" id="cal-observed-attack" class="buff-source" value="" step="0.01" placeholder="e.g. 129513.39">
+          <div class="calibration-result" id="cal-result-attack" style="margin-top: 0.25rem; font-weight: bold;"></div>
+        </div>
+        <div class="source-group">
+          <h4>Observed Defense per Troop</h4>
+          <input type="number" id="cal-observed-defense" class="buff-source" value="" step="0.01" placeholder="e.g. 13992">
+          <div class="calibration-result" id="cal-result-defense" style="margin-top: 0.25rem; font-weight: bold;"></div>
+        </div>
+        <div class="source-group">
+          <h4>Observed HP per Troop</h4>
+          <input type="number" id="cal-observed-hp" class="buff-source" value="" step="0.01" placeholder="e.g. 32294">
+          <div class="calibration-result" id="cal-result-hp" style="margin-top: 0.25rem; font-weight: bold;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="spectrum-Button spectrum-Button--secondary spectrum-Button--sizeM" onclick="closeCalibrationModal()">
+        <span class="spectrum-Button-label">Cancel</span>
+      </button>
+      <button type="button" class="spectrum-Button spectrum-Button--accent spectrum-Button--sizeM" onclick="calculateCalibration()">
+        <span class="spectrum-Button-label">Calculate</span>
+      </button>
+      <button type="button" class="spectrum-Button spectrum-Button--accent spectrum-Button--sizeM" id="applyCalibrationBtn" onclick="applyCalibration()" disabled>
+        <span class="spectrum-Button-label">Apply to Simulator</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
 let currentBuffType = null;
 const buffData = {
@@ -579,6 +637,95 @@ function applyBuffTotal() {
   }
 
   closeBuffCalculator();
+}
+
+// Sync manually-entered buff total into the hidden _basic field
+function syncBuffTotal(statType) {
+  const total = parseFloat(document.getElementById(`total_${statType}`).value) || 0;
+  document.getElementById(`${statType}_basic`).value = total;
+  // Clear other categories since user entered a flat total
+  document.getElementById(`${statType}_march`).value = 0;
+  document.getElementById(`${statType}_monster`).value = 0;
+  document.getElementById(`${statType}_misc`).value = 0;
+  document.getElementById(`${statType}_rally`).value = 0;
+}
+
+// Base stats lookup (injected from server)
+const BASE_STATS = [% base_stats_json %];
+
+let calibrationResults = {};
+
+function openCalibrationModal() {
+  const tier = document.getElementById('tier').value;
+  const troopType = document.getElementById('troop_type').value;
+  const troopTypeLabel = document.getElementById('troop_type').selectedOptions[0].text;
+
+  document.getElementById('cal-tier').textContent = tier;
+  document.getElementById('cal-troop-type').textContent = troopTypeLabel;
+
+  // Clear previous inputs and results
+  document.getElementById('cal-observed-attack').value = '';
+  document.getElementById('cal-observed-defense').value = '';
+  document.getElementById('cal-observed-hp').value = '';
+  document.getElementById('cal-result-attack').textContent = '';
+  document.getElementById('cal-result-defense').textContent = '';
+  document.getElementById('cal-result-hp').textContent = '';
+  document.getElementById('applyCalibrationBtn').disabled = true;
+  calibrationResults = {};
+
+  document.getElementById('calibrationModal').style.display = 'flex';
+}
+
+function closeCalibrationModal() {
+  document.getElementById('calibrationModal').style.display = 'none';
+}
+
+function calculateCalibration() {
+  const tier = document.getElementById('tier').value;
+  const troopType = document.getElementById('troop_type').value;
+
+  const baseAttack = BASE_STATS.attack[tier] && BASE_STATS.attack[tier][troopType];
+  const baseDefense = BASE_STATS.defense[tier] && BASE_STATS.defense[tier][troopType];
+  const baseHp = BASE_STATS.hp[tier] && BASE_STATS.hp[tier][troopType];
+
+  if (!baseAttack || !baseDefense || !baseHp) {
+    document.getElementById('cal-result-attack').textContent = 'Base stats not found for this tier/troop type';
+    return;
+  }
+
+  calibrationResults = {};
+  let hasResult = false;
+
+  for (const [stat, base, inputId, resultId] of [
+    ['attack', baseAttack, 'cal-observed-attack', 'cal-result-attack'],
+    ['defense', baseDefense, 'cal-observed-defense', 'cal-result-defense'],
+    ['hp', baseHp, 'cal-observed-hp', 'cal-result-hp'],
+  ]) {
+    const observed = parseFloat(document.getElementById(inputId).value);
+    const resultEl = document.getElementById(resultId);
+
+    if (observed && observed > 0) {
+      const buffPct = ((observed / base) - 1) * 100;
+      calibrationResults[stat] = buffPct;
+      resultEl.textContent = `= ${buffPct.toFixed(2)}% (base: ${base})`;
+      resultEl.style.color = buffPct >= 0 ? 'var(--spectrum-semantic-positive-color-default, green)' : 'var(--spectrum-semantic-negative-color-default, red)';
+      hasResult = true;
+    } else {
+      resultEl.textContent = '';
+    }
+  }
+
+  document.getElementById('applyCalibrationBtn').disabled = !hasResult;
+}
+
+function applyCalibration() {
+  for (const stat of ['attack', 'defense', 'hp']) {
+    if (calibrationResults[stat] !== undefined) {
+      document.getElementById(`total_${stat}`).value = calibrationResults[stat].toFixed(2);
+      syncBuffTotal(stat);
+    }
+  }
+  closeCalibrationModal();
 }
 
 // Handle unknown checkbox changes

@@ -39,7 +39,7 @@
       </div>
       <div class="result-item">
         <span class="label">Troop Count:</span>
-        <span class="value">[% result.troop_count | format_number %]</span>
+        <span class="value">[% format_number(result.troop_count) %]</span>
       </div>
     </div>
   </section>
@@ -119,16 +119,24 @@
         <span class="value">[% result.damage_per_troop %]</span>
       </div>
       <div class="result-item">
-        <span class="label">Effective Damage:</span>
-        <span class="value">[% result.effective_damage %]</span>
+        <span class="label">Combat Turns:</span>
+        <span class="value">[% result.combat_turns %]</span>
       </div>
       <div class="result-item primary">
         <span class="label">Minimum Troops to Kill:</span>
-        <span class="value">[% result.min_troops_to_kill | format_number %]</span>
+        <span class="value">[% format_number(result.min_troops_to_kill) %]</span>
+      </div>
+      <div class="result-item">
+        <span class="label">Initial Wounded:</span>
+        <span class="value">[% format_number(result.initial_wounded) %]</span>
       </div>
       <div class="result-item">
         <span class="label">Expected Wounds:</span>
-        <span class="value">[% result.expected_wounds | format_number %]</span>
+        <span class="value">[% format_number(result.expected_wounds) %]</span>
+      </div>
+      <div class="result-item">
+        <span class="label">Troops Surviving:</span>
+        <span class="value">[% format_number(result.troops_surviving) %]</span>
       </div>
     </div>
   </section>
