@@ -6,7 +6,6 @@ use lib '../PAGI-WebServer/lib';
 package Game::EvonyTKR {
   use Mooish::Base -standard;
   extends 'WebFramework::App';
-  with 'WebFramework::Role::Logger';
 
   our $VERSION = 'v0.50.0';
 

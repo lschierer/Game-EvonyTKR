@@ -17,7 +17,6 @@ package Game::EvonyTKR::Controller::Pairs {
   with 'Game::EvonyTKR::Role::Constants::BuffConstants';
   with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
   with 'Game::EvonyTKR::Role::Constants::Covenants';
-  with 'WebFramework::Role::Markdown';
 
   use List::Util     qw(min);
   use List::AllUtils qw(all any none first);

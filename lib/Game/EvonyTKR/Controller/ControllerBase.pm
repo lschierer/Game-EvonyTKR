@@ -7,7 +7,6 @@ extends 'WebFramework::Controller::Base';
 # Compose EvonyTKR-specific roles
 with 'Game::EvonyTKR::Role::Common';
 with 'Game::EvonyTKR::Role::JSON';
-with 'WebFramework::Role::Logger';
 
 require YAML::PP;
 require Data::Printer;
