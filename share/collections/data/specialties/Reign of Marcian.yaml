@@ -1,0 +1,122 @@
+name: Reign of Marcian
+levels:
+  - level: Green
+    text: >-
+      Attacking Ranged Troop Attack +5%.
+      Attacking Ranged Troop Defense +5%.
+      Attacking Ranged Troop HP +4%.
+    buffs:
+      - attribute: Attack
+        troop: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 5
+      - attribute: Defense
+        troop: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 5
+      - attribute: HP
+        troop: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 4
+  - level: Blue
+    text: >-
+      Attacking Ranged Troop Attack +6%.
+      Attacking Ranged Troop Defense +6%.
+      Attacking Ranged Troop HP +4%.
+    buffs:
+      - attribute: Attack
+        troop: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 6
+      - attribute: Defense
+        troop: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 6
+      - attribute: HP
+        troop: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 4
+  - level: Purple
+    text: >-
+      Attacking Ranged Troop Attack +11%.
+      Attacking Ranged Troop Defense +11%.
+      Attacking Ranged Troop HP +8%.
+    buffs:
+      - attribute: Attack
+        troop: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 11
+      - attribute: Defense
+        troop: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 11
+      - attribute: HP
+        troop: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 8
+  - level: Orange
+    text: >-
+      Attacking Ranged Troop Attack +11%.
+      Attacking Ranged Troop Defense +11%.
+      Attacking Ranged Troop HP +8%.
+    buffs:
+      - attribute: Attack
+        troop: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 11
+      - attribute: Defense
+        troop: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 11
+      - attribute: HP
+        troop: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 8
+  - level: Gold
+    text: >-
+      Attacking Ranged Troop Attack +22%.
+      Attacking Ranged Troop Defense +22%.
+      Attacking Ranged Troop HP +16%.
+    buffs:
+      - attribute: Attack
+        troop: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 22
+      - attribute: Defense
+        troop: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 22
+      - attribute: HP
+        troop: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 16

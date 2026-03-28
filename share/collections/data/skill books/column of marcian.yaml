@@ -1,0 +1,25 @@
+name: Column of Marcian
+text: >-
+  Increases ranged troops' attack and defense by 60% and HP by 45% when General is leading the army to attack.
+buffs:
+  - attribute: Attack
+    troop: Ranged Troops
+    conditions:
+      - Attacking
+      - leading the army
+    value:
+      number: 60
+  - attribute: Defense
+    troop: Ranged Troops
+    conditions:
+      - Attacking
+      - leading the army
+    value:
+      number: 60
+  - attribute: HP
+    troop: Ranged Troops
+    conditions:
+      - Attacking
+      - leading the army
+    value:
+      number: 45

@@ -1,0 +1,100 @@
+id: Marcian
+general: Marcian
+ascending:
+  - level: red1
+    text: Attacking Ranged Troop Attack, Defense and HP +10%
+    buffs:
+      - attribute: Attack
+        troop: Ranged Troops
+        conditions:
+          - attacking
+        value:
+          number: 10
+      - attribute: Defense
+        troop: Ranged Troops
+        conditions:
+          - attacking
+        value:
+          number: 10
+      - attribute: HP
+        troop: Ranged Troops
+        conditions:
+          - attacking
+        value:
+          number: 10
+  - level: red2
+    text: Attacking Troop Death into Wounded Rate +8%
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - attacking
+        passive: 0
+        value:
+          number: 8
+          unit: percentage 
+  - level: red3
+    text: Attacking Ranged Troop Attack +25%, Attacking Ranged Troop and Siege Machine HP +20%
+    buffs:
+      - attribute: Attack
+        troop: Ranged Troop
+        conditions:
+          - attacking
+        value:
+          number: 25
+      - attribute: HP
+        troop: Ranged Troop
+        conditions:
+          - attacking
+        value:
+          number: 20
+      - attribute: HP
+        troop: Siege Machines
+        conditions:
+          - attacking
+        value:
+          number: 20
+  - level: red4
+    text: Attacking Ranged Troop and Siege Machine Attack and Defense +20%
+    buffs:
+      - attribute: Attack
+        troop: Ranged Troops
+        conditions:
+          - attacking
+        value: 
+          number: 20
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - attacking
+        value: 
+          number: 20
+      - attribute: Defense
+        troop: Ranged Troops
+        conditions:
+          - attacking
+        value: 
+          number: 20
+      - attribute: Defense
+        troop: Siege Machines
+        conditions:
+          - attacking
+        value: 
+          number: 20
+  - level: red5
+    text: Attacking Ranged Troop Attack and HP +35%, March Size Capacity +8%.
+    buffs:
+      - attribute: Attack
+        troop: Ranged Troops
+        conditions:
+          - attacking
+        value:
+          number: 35
+      - attribute: HP
+        troop: Ranged Troops
+        conditions:
+          - attacking
+        value:
+          number: 35
+      - attribute: March Size
+        value:
+          number: 8
