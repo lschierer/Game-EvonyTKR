@@ -245,13 +245,13 @@ sub is_ascending_active ($self, $level, $selected) {
 }
 
 sub is_covenant_active ($self, $level, $selected) {
-  my @levels    = qw(none war cooperation civilization faith honor peace);
+  my @levels    = qw(none war cooperation peace faith honor civilization);
   my %level_num = map { $levels[$_] => $_ } 0 .. $#levels;
 
   my $level_idx    = $level_num{ lc($level) }    // 0;
   my $selected_idx = $level_num{ lc($selected) } // 0;
 
-# Covenant is cumulative: if selected=civilization, then war, cooperation, civilization are all active
+# Covenant is cumulative: if selected=civilization, then all levels are active (civilization is highest)
   return $level_idx > 0 && $level_idx <= $selected_idx ? 1 : 0;
 }
 
@@ -491,16 +491,22 @@ sub compute_pair_buffs ($self, %args) {
   my $primary_filters   = $args{primary_filters}   || {};
   my $secondary_filters = $args{secondary_filters} || {};
 
-  # CRITICAL: For pairs, we select 6 best generic books total (not 3 for each)
-  # Apply all 6 to primary, none to secondary, to avoid duplicate book selection
   my $pair_primary_filters   = {%$primary_filters};
   my $pair_secondary_filters = {%$secondary_filters};
 
-  # Use 6 books for primary (best 6 for the pair)
-  $pair_primary_filters->{generic1} = 'level6';
-
-  # No generic books for secondary (they're already counted in primary's 6)
-  $pair_secondary_filters->{generic1} = 'none';
+  # In a pair, each book can only be held by one general (no duplicates).
+  # Primary gets the top 6 books (covering both generals' 3 slots) to avoid
+  # duplicate conflicts; secondary gets none. top6_levelN rows are compiled
+  # into each general's matrix for exactly this purpose.
+  my $generic_level = $primary_filters->{generic1} // 'level4';
+  if ($generic_level ne 'none') {
+    $pair_primary_filters->{generic1}   = "top6_$generic_level";
+    $pair_secondary_filters->{generic1} = 'none';
+  }
+  else {
+    $pair_primary_filters->{generic1}   = 'none';
+    $pair_secondary_filters->{generic1} = 'none';
+  }
 
   # Compute buffs for each general
   my $primary_buffs = $self->compute_buffs(

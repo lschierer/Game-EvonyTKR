@@ -195,7 +195,7 @@ sub compile_general ($self, $general_name, $activation_type) {
   }
 
 # Rows 12-18: Covenant levels (none, war, cooperation, civilization, faith, honor, peace)
-  my @cov_levels = qw(none war cooperation civilization faith honor peace);
+  my @cov_levels = qw(none war cooperation peace faith honor civilization);
   for my $level (@cov_levels) {
     my $cov_row =
       $self->_compile_covenant_buffs($covenant_data, $level, $activation_type,
@@ -224,8 +224,9 @@ sub compile_general ($self, $general_name, $activation_type) {
 
 # Additional rows: Generic books (only from slot 1 - they're universal, not per-slot)
 # Generic books provide universal buffs that apply once, not per slot
-# Support up to level6 for pair computation (3 books per general = 6 total)
-  my @generic_levels = qw(none level1 level2 level3 level4 level5 level6);
+# top6_levelN rows select top 6 books at level N, used for pair primary (no duplicates)
+  my @generic_levels =
+    qw(none level1 level2 level3 level4 top6_level1 top6_level2 top6_level3 top6_level4);
 
   for my $level (@generic_levels) {
     my $generic_row =
@@ -390,8 +391,8 @@ sub _compile_covenant_buffs ($self, $cov_data, $level, $activation_type,
 
   return $row if $level eq 'none';
 
-# Covenant levels are cumulative: war < cooperation < civilization < faith < honor < peace
-  my @levels     = qw(war cooperation civilization faith honor peace);
+# Covenant levels are cumulative: war < cooperation < peace < faith < honor < civilization
+  my @levels     = qw(war cooperation peace faith honor civilization);
   my %level_rank = map { $levels[$_] => $_ } 0 .. $#levels;
 
   my $selected_rank = $level_rank{ lc($level) };
@@ -522,12 +523,23 @@ sub _select_best_generic_books_simple ($self, $general, $activation_type,
     return \%buffs;
   }
 
-  # Sort by priority and take top 3
+  # Sort by priority
   my @sorted_book_names =
     sort { $best_books->{$a} <=> $best_books->{$b} } keys %$best_books;
-  my @selected_books = @sorted_book_names[0 .. 2];    # Top 3 books
 
-  my $book_level_num = $book_level =~ /(\d+)/ ? $1 : 4;
+  # top6_levelN selects top 6 books at level N (for pair primary, no duplicates)
+  # levelN selects top 3 books at level N (single general)
+  my ($book_count, $book_level_num);
+  if ($book_level =~ /^top(\d+)_level(\d+)$/) {
+    $book_count    = $1;
+    $book_level_num = $2;
+  }
+  else {
+    $book_count    = 3;
+    $book_level_num = $book_level =~ /(\d+)/ ? $1 : 4;
+  }
+  $book_count = scalar @sorted_book_names if $book_count > scalar @sorted_book_names;
+  my @selected_books = @sorted_book_names[0 .. ($book_count - 1)];
 
 # Load and sum buffs from selected books
 # Note: Generic book filenames include the level (e.g., "Level 4 Ground Troop Attack.yaml")

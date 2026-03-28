@@ -107,7 +107,7 @@ sub _register_common_routes ($self) {
           };
         }
 
-        use JSON::MaybeXS;
+        use JSON::MaybeXS ();
         my $json = JSON::MaybeXS->new(utf8 => 1, pretty => 1);
 
         my $response = $json->encode({

@@ -5,8 +5,8 @@ use Mooish::Base -standard;
 with 'WebFramework::Role::Logger';
 with 'WebFramework::Role::Markdown';
 
-use Path::Tiny qw(path);
-use YAML::PP;
+require Path::Tiny;
+require YAML::PP;
 
 use Game::EvonyTKR::Model::Glossary;
 
@@ -76,7 +76,7 @@ has stats => (
 sub load_all ($self) {
   $self->logger->info("Loading glossary terms from " . $self->data_dir);
 
-  my $data_path = path($self->data_dir);
+  my $data_path = Path::Tiny::path($self->data_dir);
 
   unless ($data_path->is_dir) {
     $self->logger->error("Glossary directory not found: " . $self->data_dir);

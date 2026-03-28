@@ -112,7 +112,7 @@ sub index ($self, $ctx) {
 
   # Build base stats JSON for calibration modal
   my $monster_simulator_data = $self->monster_simulator_data();
-  use JSON::MaybeXS;
+  use JSON::MaybeXS ();
   my $json = JSON::MaybeXS->new(utf8 => 0);
   my $base_stats_json = $json->encode({
     attack  => $monster_simulator_data->troop_base_attack,
@@ -294,7 +294,7 @@ sub api_monsters ($self, $ctx) {
     $results = $monsters_loader->list_unique_names();
   }
 
-  use JSON::MaybeXS;
+  use JSON::MaybeXS ();
   my $json = JSON::MaybeXS->new(utf8 => 1);
 
   $ctx->res->headers(content_type => 'application/json');
@@ -324,7 +324,7 @@ sub _monster_levels_response ($self, $ctx, $name) {
     }
   }
 
-  use JSON::MaybeXS;
+  use JSON::MaybeXS ();
   my $json = JSON::MaybeXS->new(utf8 => 1);
 
   $ctx->res->headers(content_type => 'application/json');
