@@ -1,0 +1,33 @@
+# cspell: ignore Arsuf
+name: Battle of Arsuf
+levels:
+  - level: green
+    text: Hospital Capacity +4%
+    buffs:
+      - attribute: Hospital Capacity
+        value:
+          number: 4
+  - level: blue
+    text: Hospital Capacity +4%
+    buffs:
+      - attribute: Hospital Capacity
+        value:
+          number: 4          
+  - level: purple
+    text: Hospital Capacity +7%
+    buffs:
+      - attribute: Hospital Capacity
+        value:
+          number: 7
+  - level: orange
+    text: Hospital Capacity +7%
+    buffs:
+      - attribute: Hospital Capacity
+        value:
+          number: 7
+  - level: gold
+    text: Hospital Capacity +14%
+    buffs:
+      - attribute: Hospital Capacity
+        value:
+          number: 14

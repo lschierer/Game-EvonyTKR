@@ -1,0 +1,10 @@
+name: >-
+  King's Blessing
+text: >-
+  Increases Hospital Capacity by 30% when General is the Main City's Defense General.
+buffs:
+  - attribute: Hospital Capacity
+    conditions:
+      - When The Main Defense General
+    value:
+      number: 30
