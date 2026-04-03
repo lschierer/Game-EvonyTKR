@@ -1,6 +1,6 @@
 import * as z from 'zod';
 
-import { General } from 'lib/Game/EvonyTKR/Shared/EvonySchemas';
+import { General } from '../Game/EvonyTKR/Shared/EvonySchemas';
 
 const PairBuffs = z.object({
   primary: General,

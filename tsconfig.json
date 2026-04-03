@@ -1,17 +1,17 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "@tsconfig/node22/tsconfig.json",
+  "extends": "@tsconfig/node24/tsconfig.json",
   "compilerOptions": {
     "allowImportingTsExtensions": true,
     "esModuleInterop": true,
-    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "lib": ["ES2025", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "resolveJsonModule": true,
     "strict": true,
-    "target": "ES2023",
+    "target": "ES2025",
     "verbatimModuleSyntax": true,
     "experimentalDecorators": true,
     "useDefineForClassFields": true,
@@ -25,7 +25,6 @@
     "noEmit": true,
     "composite": true,
     "rootDir": ".",
-    "baseUrl": "./",
     "outDir": "./share/public/types",
     "declarationDir": "./share/public/types"
   },
