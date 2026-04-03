@@ -547,7 +547,7 @@ qr/(?:ground_specialist|mounted_specialist|ranged_specialist|siege_specialist|ma
     };
 
     my $secondary_filters = {
-      ascendingLevel     => $ascendingLevel,
+      ascendingLevel     => 'none',
       covenantLevel      => $secondaryCovenantLevel,
       generalLevel       => $generalLevel,
       victoryColumnLevel => $victoryColumnLevel,

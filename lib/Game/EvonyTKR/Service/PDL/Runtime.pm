@@ -4,6 +4,8 @@ use utf8;
 use Moo;
 use experimental 'signatures';
 with 'WebFramework::Role::Logger';
+with 'Game::EvonyTKR::Role::Constants::Covenants';
+with 'Game::EvonyTKR::Role::Constants::Specialties';
 use PDL;
 use PDL::NiceSlice;
 use Game::EvonyTKR::Service::PDL::Compiler;
@@ -129,8 +131,8 @@ Arguments:
 - general: General name (e.g., 'Marco Polo')
 - activation: Activation type (e.g., 'Attacking', 'PvM', 'Mayor')
 - filters: Hashref of filter selections:
-  - ascendingLevel: 'none', 'red1'-'red5', 'orange1'-'orange5'
-  - covenantLevel: 'none', 'war', 'cooperation', 'civilization', 'faith', 'honor', 'peace'
+  - ascendingLevel: 'none', 'purple1'-'purple5', 'red1'-'red5'
+  - covenantLevel: 'none', 'war', 'cooperation', 'peace', 'faith', 'honor', 'civilization'
   - specialty1-4: 'none', 'green', 'blue', 'purple', 'orange', 'gold'
   - generic1-4: 'none', 'level1', 'level2', 'level3', 'level4'
 
@@ -233,8 +235,9 @@ sub build_filter_mask ($self, $compiled, $filters) {
 }
 
 sub is_ascending_active ($self, $level, $selected) {
+  # Order matches Role::Constants::AscendingAttributes: purple (lower rank) < red (higher rank)
   my @levels =
-    qw(none red1 red2 red3 red4 red5 orange1 orange2 orange3 orange4 orange5);
+    qw(none purple1 purple2 purple3 purple4 purple5 red1 red2 red3 red4 red5);
   my %level_num = map { $levels[$_] => $_ } 0 .. $#levels;
 
   my $level_idx    = $level_num{$level}    // 0;
@@ -245,7 +248,8 @@ sub is_ascending_active ($self, $level, $selected) {
 }
 
 sub is_covenant_active ($self, $level, $selected) {
-  my @levels    = qw(none war cooperation peace faith honor civilization);
+  # Order derived from Role::Constants::Covenants::CovenantCategoryValues
+  my @levels    = $self->CovenantCategoryValues->@*;
   my %level_num = map { $levels[$_] => $_ } 0 .. $#levels;
 
   my $level_idx    = $level_num{ lc($level) }    // 0;
@@ -256,7 +260,8 @@ sub is_covenant_active ($self, $level, $selected) {
 }
 
 sub is_specialty_active ($self, $level, $selected) {
-  my @levels    = qw(none green blue purple orange gold);
+  # Order derived from Role::Constants::Specialties::SpecialtyLevelValues
+  my @levels    = $self->SpecialtyLevelValues->@*;
   my %level_num = map { $levels[$_] => $_ } 0 .. $#levels;
 
   my $level_idx    = $level_num{ lc($level) }    // 0;

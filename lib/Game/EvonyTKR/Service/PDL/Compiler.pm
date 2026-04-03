@@ -6,6 +6,9 @@ use experimental 'signatures';
 with 'WebFramework::Role::Logger';
 with 'Game::EvonyTKR::Role::Common';
 with 'Game::EvonyTKR::Role::Constants::Books';
+with 'Game::EvonyTKR::Role::Constants::BuffConstants';
+with 'Game::EvonyTKR::Role::Constants::Covenants';
+with 'Game::EvonyTKR::Role::Constants::Specialties';
 use PDL;
 use PDL::NiceSlice;
 use YAML::XS           qw(LoadFile);
@@ -184,9 +187,10 @@ sub compile_general ($self, $general_name, $activation_type) {
   push @rows,       $book_row;
   push @row_labels, 'book';
 
-  # Rows 1-11: Ascending levels (none, red1-red5, orange1-orange5)
+  # Rows 1-11: Ascending levels (none, purple1-purple5, red1-red5)
+  # Order matches Role::Constants::AscendingAttributes: purple (lower) < red (higher)
   my @asc_levels =
-    qw(none red1 red2 red3 red4 red5 orange1 orange2 orange3 orange4 orange5);
+    qw(none purple1 purple2 purple3 purple4 purple5 red1 red2 red3 red4 red5);
   for my $level (@asc_levels) {
     my $asc_row = $self->_compile_ascending_buffs($ascending_data, $level,
       $activation_type, $troop_type);
@@ -194,8 +198,8 @@ sub compile_general ($self, $general_name, $activation_type) {
     push @row_labels, "asc_$level";
   }
 
-# Rows 12-18: Covenant levels (none, war, cooperation, civilization, faith, honor, peace)
-  my @cov_levels = qw(none war cooperation peace faith honor civilization);
+  # Rows 12-18: Covenant levels — derived from Role::Constants::Covenants::CovenantCategoryValues
+  my @cov_levels = $self->CovenantCategoryValues->@*;
   for my $level (@cov_levels) {
     my $cov_row =
       $self->_compile_covenant_buffs($covenant_data, $level, $activation_type,
@@ -207,7 +211,7 @@ sub compile_general ($self, $general_name, $activation_type) {
   # Rows 19+: Specialty combinations (4 slots × 6 levels each)
   # For now, we'll compile each specialty slot at each level separately
   # The runtime will combine them based on user selections
-  my @spec_levels = qw(none green blue purple orange gold);
+  my @spec_levels = $self->SpecialtyLevelValues->@*;
   for my $slot_idx (0 .. 3) {
     my $spec_name = $general_data->{specialties}[$slot_idx];
     next unless $spec_name;
@@ -392,7 +396,8 @@ sub _compile_covenant_buffs ($self, $cov_data, $level, $activation_type,
   return $row if $level eq 'none';
 
 # Covenant levels are cumulative: war < cooperation < peace < faith < honor < civilization
-  my @levels     = qw(war cooperation peace faith honor civilization);
+  # Order derived from Role::Constants::Covenants::CovenantCategoryValues (excludes 'none')
+  my @levels     = grep { $_ ne 'none' } $self->CovenantCategoryValues->@*;
   my %level_rank = map { $levels[$_] => $_ } 0 .. $#levels;
 
   my $selected_rank = $level_rank{ lc($level) };
@@ -407,9 +412,6 @@ sub _compile_covenant_buffs ($self, $cov_data, $level, $activation_type,
     next unless defined $cov_rank && $cov_rank <= $selected_rank;
 
     for my $buff (@{ $cov->{buffs} || [] }) {
-      # Skip passive buffs for now (they apply differently)
-      next if $buff->{passive};
-
       next unless $self->_buff_applies($buff, $activation_type, $troop_type);
 
       # Check if this is a debuff (Enemy condition)
@@ -434,7 +436,8 @@ sub _compile_specialty_buffs ($self, $spec_data, $level, $activation_type,
   return $row if $level eq 'none' || !$spec_data;
 
   # Specialty levels are cumulative: green < blue < purple < orange < gold
-  my @levels     = qw(green blue purple orange gold);
+  # Order derived from Role::Constants::Specialties::SpecialtyLevelValues (excludes 'none')
+  my @levels     = grep { $_ ne 'none' } $self->SpecialtyLevelValues->@*;
   my %level_rank = map { $levels[$_] => $_ } 0 .. $#levels;
 
   my $selected_rank = $level_rank{ lc($level) };
@@ -583,45 +586,37 @@ sub _select_best_generic_books_simple ($self, $general, $activation_type,
 }
 
 sub _buff_applies ($self, $buff, $activation_type, $troop_type) {
-  # Check if buff applies to this activation type
   my $conditions = $buff->{conditions} || [];
 
   # If no conditions, it always applies
   return 1 unless @$conditions;
 
-# Filter out 'Enemy' and 'Monsters' from conditions for activation matching
-# These indicate debuffs and apply based on other conditions, or always if they're the only condition
-  my @non_debuff_conditions =
-    grep { $_ ne 'Enemy' && $_ ne 'Monsters' } @$conditions;
+  # Separate debuff conditions (Enemy, Monsters) from activation conditions
+  my %is_debuff = map { $_ => 1 } $self->DebuffConditionValues->@*;
+  my @non_debuff_conditions = grep { !$is_debuff{$_} } @$conditions;
 
-# If only debuff conditions exist, the buff applies (it's an unconditional enemy debuff)
-  return 1 if @$conditions && !@non_debuff_conditions;
+  # If only debuff conditions exist, the buff applies (it's an unconditional enemy debuff)
+  return 1 if !@non_debuff_conditions;
 
-  # Map activation types to condition keywords
-  my %activation_map = (
-    'Attacking'    => ['Attacking', 'Marching', 'Attack', 'Leading'],
-    'PvM'          => ['Attacking', 'Marching', 'Attack', 'Leading', 'Monsters', 'PvM', 'Against Monsters'],
-    'Overall'      => ['Attacking', 'Marching', 'Attack', 'Leading'],
-    'Mayor'        => ['Mayor',     'Wall'],
-    'Defending'    => ['Defending', 'Defense'],
-    'Reinforcing'  => ['Reinforcing'],
-    'Defense'      => ['Defending', 'Defense'],
-    'In City'      => ['Defending', 'Defense'],
-    'Out City'     => ['Attacking', 'Marching', 'Attack', 'Leading'],
-    'Wall'         => ['Wall'],
-    'Officer'      => ['Officer'],
-  );
+  # Use BuffConditionValues as the canonical source of condition→activation mappings.
+  # Also normalise any alternate condition spellings via MappedConditionNames.
+  my $condition_map  = $self->BuffConditionValues;
+  my $condition_aliases = $self->MappedConditionNames;
 
-  my $keywords = $activation_map{$activation_type} || [];
-
-  # Check if any non-debuff conditions match the activation type
-  for my $keyword (@$keywords) {
-    for my $condition (@non_debuff_conditions) {
-      return 1 if lc($condition) =~ /\Q\L$keyword\E/;
+  for my $condition (@non_debuff_conditions) {
+    # MappedConditionNames and BuffConditionValues are Const::Fast restricted hashes;
+    # must use exists before accessing to avoid "disallowed key" exceptions.
+    my $canonical = (exists $condition_aliases->{$condition})
+      ? $condition_aliases->{$condition}
+      : $condition;
+    if (exists $condition_map->{$canonical}) {
+      my $activation_map = $condition_map->{$canonical};
+      return 1
+        if exists $activation_map->{$activation_type}
+        && $activation_map->{$activation_type};
     }
   }
 
-  # If we have conditions but none matched, don't apply
   return 0;
 }
 
