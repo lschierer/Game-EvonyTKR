@@ -1,6 +1,5 @@
 [tools]
 jq = "latest"
-just = "latest"
 node = "24"
 pandoc = "latest"
 perl = "latest"
@@ -8,3 +7,146 @@ pnpm = "10"
 python = "latest"
 watchexec = "latest"
 yq = "latest"
+
+[tasks.find-perl-deps]
+description = "Find Perl dependencies"
+run = "./scripts/finddeps.sh"
+
+[tasks.brewpostgres]
+description = "Start local PostgreSQL 14"
+run = 'LC_ALL="en_US.UTF-8" /opt/homebrew/opt/postgresql@14/bin/postgres -D /opt/homebrew/var/postgresql@14'
+
+[tasks.tidy]
+description = "Format Perl code"
+run = """
+find lib -name '*.pm' -exec perltidy -b -pro=.perltidyrc {} \\;
+find t -name '*.t' -exec perltidy -b -pro=.perltidyrc {} \\;
+perltidy -b -pro=.perltidyrc Build.PL
+perltidy -b -pro=.perltidyrc scripts/create-general bin/game-evonytkr scripts/update_git_meta.pl
+find . -name '*.bak' -delete
+"""
+
+[tasks.clean]
+description = "Clean build artifacts"
+run = """
+rm -f MANIFEST
+rm -rf _build
+rm -rf blib
+rm -f Build
+rm -rf cdk.out
+rm -f MYMETA.*
+"""
+
+[tasks.prepare]
+description = "Install tools and set up Perl build"
+run = """
+mise install
+perl Build.PL
+"""
+
+[tasks.npmdeps]
+description = "Install npm dependencies"
+run = "pnpm install"
+
+[tasks.deps]
+description = "Install all dependencies"
+depends = ["prepare", "npmdeps"]
+run = """
+./Build installdeps --cpan_client 'cpanm -n'
+pip install -e scripts
+perl ./scripts/update_git_meta.pl
+"""
+
+[tasks.images]
+description = "Sync image assets"
+dir = "share"
+run = """
+rsync -a --delete images/ public/images/
+rsync -a --delete collections/data/images/generals/ public/images/generals/
+"""
+
+[tasks.css]
+description = "Build CSS"
+depends = ["npmdeps", "images"]
+run = """
+rm -rf share/public/css
+mkdir -p share/public/css
+pnpm build:css
+"""
+
+[tasks.ts]
+description = "Build TypeScript"
+depends = ["npmdeps", "css"]
+run = """
+rm -rf share/public/js
+mkdir -p share/public/js
+rm -rf share/public/types
+mkdir -p share/public/types
+pnpm build:ts
+"""
+
+[tasks.build]
+description = "Full build"
+depends = ["prepare", "deps", "css", "images", "ts"]
+run = """
+./Build manifest
+./Build
+"""
+
+[tasks.dev]
+description = "Development server"
+depends = ["deps", "css", "images", "build"]
+run = """
+truncate -s 0 "${HOME}/var/log/Perl/dist/Game-EvonyTKR/system.log"
+truncate -s 0 "${HOME}/var/log/Perl/dist/WebFramework/system.log"
+truncate -s 0 "${HOME}/var/log/Perl/dist/WebFramework/access.log"
+./bin/server.pl --mode development
+"""
+
+[tasks.quickdev]
+description = "Quick dev server with log reset"
+run = """
+truncate -s 0 "${HOME}/var/log/Perl/dist/Game-EvonyTKR/system.log"
+truncate -s 0 "${HOME}/var/log/Perl/dist/WebFramework/system.log"
+truncate -s 0 "${HOME}/var/log/Perl/dist/WebFramework/access.log"
+./scripts/dev.sh
+"""
+
+[tasks.deploy-dev]
+description = "Deploy to dev environment"
+depends = ["clean"]
+run = """
+pnpm cdk --profile personal acknowledge 34892
+MODE='dev' pnpm cdk --profile personal deploy
+"""
+
+[tasks.deploy-test]
+description = "Deploy to test environment"
+depends = ["clean"]
+run = """
+pnpm cdk --profile personal acknowledge 34892
+MODE='test' pnpm cdk --profile personal deploy
+"""
+
+[tasks.deploy-prod]
+description = "Deploy to production"
+depends = ["clean"]
+run = """
+pnpm cdk --profile personal acknowledge 34892
+MODE='prod' pnpm cdk --profile personal deploy
+"""
+
+[tasks.dev-image]
+description = "Build dev Docker image"
+depends = ["build"]
+dir = "share/infrastructure"
+run = "./bin/build-image.sh -d"
+
+[tasks.mlModel]
+description = "Train and run ML conflict model"
+run = """
+perl bin/extract_conflict_features.pl --mode=training --output=training_data.csv
+python bin/train_conflict_model.py --training=training_data.csv --model=conflict_model.pkl --importance=feature_importance.csv
+perl bin/extract_conflict_features.pl --mode=predict --output=all_pairs.csv
+python bin/predict_conflicts.py --model=conflict_model.pkl --pairs=all_pairs.csv --output=conflicts.json
+"""

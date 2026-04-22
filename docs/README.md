@@ -4,23 +4,23 @@ This is very much a work in progress.
 
 ### Setup and Dependencies
 ```bash
-just prepare          # Install mise tools and run perl Build.PL
-just npmdeps          # Install node dependencies via pnpm
-just deps             # Complete dependency setup (Perl + npm)
+mise run prepare          # Install mise tools and run perl Build.PL
+mise run npmdeps          # Install node dependencies via pnpm
+mise run deps             # Complete dependency setup (Perl + npm)
 ```
 
 ### Development
 ```bash
-just dev              # Full rebuild + watch mode with morbo
-just quickdev         # Fast dev server without full rebuild
+mise run dev              # Full rebuild + watch mode with morbo
+mise run quickdev         # Fast dev server without full rebuild
 ```
 
 ### Building
 ```bash
-just build            # Full production build (Perl + CSS + TypeScript)
-just css              # Build CSS only (PostCSS + Spectrum CSS)
-just ts               # Build TypeScript only (esbuild compilation)
-just images           # Sync images to public directory
+mise run build            # Full production build (Perl + CSS + TypeScript)
+mise run css              # Build CSS only (PostCSS + Spectrum CSS)
+mise run ts               # Build TypeScript only (esbuild compilation)
+mise run images           # Sync images to public directory
 ```
 
 ### Testing
@@ -30,13 +30,13 @@ just images           # Sync images to public directory
 
 ### Deployment
 ```bash
-just deploy-dev       # Deploy to AWS dev stack
-just deploy-prod      # Deploy to AWS production stack
+mise run deploy-dev       # Deploy to AWS dev stack
+mise run deploy-prod      # Deploy to AWS production stack
 ```
 
 ### Code Quality
 ```bash
-just tidy             # Format all Perl code with perltidy
+mise run tidy             # Format all Perl code with perltidy
 ```
 
 ## Design reminders
@@ -99,4 +99,4 @@ just tidy             # Format all Perl code with perltidy
 1. **Replace `Game::EvonyTKR::External::Common`** - This module is still used for books but not for generals. It needs to be replaced with better patterns matching how other collection types work.
 1. **Fix `t/generals.t` and `t/books_caching.t`** - These tests are broken; they rely on the deprecated `External::Common` pattern and don't work with current Minion job architecture.
 1. **Unify book loading patterns** - Books have two kinds (builtin/generic) vs single kind for other collections. While this difference is necessary, the code divergence should be minimized.
-1. **Memcache test lifecycle** - Tests need memcache running but `just quickdev` manages its own for data consistency. Consider a test harness that manages memcache lifecycle, or document the manual process clearly.
+1. **Memcache test lifecycle** - Tests need memcache running but `mise run quickdev` manages its own for data consistency. Consider a test harness that manages memcache lifecycle, or document the manual process clearly.
