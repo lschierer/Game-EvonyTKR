@@ -35,6 +35,7 @@ var/
 *.csv
 *.pkl
 conflicts.json
+pnpm-lock.yaml
 
 # Generated config files
 game-evony_t_k_r.production.yml
