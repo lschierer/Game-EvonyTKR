@@ -178,26 +178,10 @@ async sub index ($self, $ctx) {
   );
 }
 
-# Generate sitemap XML for SEO
 sub generate_sitemap_xml ($self) {
-  # TODO: Implement sitemap generation based on navigation
-  my $base_url = $self->app->config->{config}->{base_url}
-    // 'https://evonytkrguide.com';
-
-  my $xml = qq{<?xml version="1.0" encoding="UTF-8"?>\n};
-  $xml .= qq{<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n};
-
-  # Add homepage
-  $xml .= qq{  <url>\n};
-  $xml .= qq{    <loc>$base_url/</loc>\n};
-  $xml .= qq{    <priority>1.0</priority>\n};
-  $xml .= qq{  </url>\n};
-
-  # TODO: Iterate through navigation items and add to sitemap
-
-  $xml .= qq{</urlset>\n};
-
-  return $xml;
+  my $base_url = $self->app->config->{config}->{site_url}
+    // 'https://evonytkrtips.net';
+  return $self->generate_sitemap($base_url);
 }
 
 1;
