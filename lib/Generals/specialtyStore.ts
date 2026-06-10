@@ -54,7 +54,7 @@ export class SpecialtyStore {
     const parsed = SpecialtyLevelValues.safeParse(value);
     if (!parsed.success) return; // ignore invalid
     this.store.setState((prev) => {
-      const next = { ...prev, [`s${i}`]: parsed.data } as SpecialtiesState;
+      const next = { ...prev, [`s${i}`]: parsed.data };
       return enforceSpecialtyConstraints(next);
     });
   }

@@ -19,8 +19,10 @@ import SpectrumProgressBarCSS from '@spectrum-css/progressbar/dist/index.css' wi
 import GeneralTableCSS from '../../../share/public/css/GeneralTable.css' with { type: 'css' };
 
 import {
-  getCoreRowModel,
-  getSortedRowModel,
+  createSortedRowModel,
+  rowSortingFeature,
+  sortFns,
+  tableFeatures,
   TableController,
   type ColumnDef,
   type SortingState,
@@ -32,6 +34,12 @@ import {
 
 import type * as data from './data';
 import type { SingleGeneralState } from '../GeneralRowSchemas';
+
+const features = tableFeatures({ rowSortingFeature });
+type Features = typeof features;
+const rowModels = {
+  sortedRowModel: createSortedRowModel<Features, SingleGeneralState>(sortFns),
+};
 
 const tableHeaders = new Map<string, string>([
   ['primary', 'Primary'],
@@ -60,11 +68,13 @@ export class SingleTable extends LitElement {
   @property({ type: String }) public allowedBuffActivation: string = 'Overall';
 
   @state() private _sorting: SortingState = [];
-  @state() private columns: ColumnDef<SingleGeneralState>[] = [];
+  @state() private columns: ColumnDef<Features, SingleGeneralState>[] = [];
 
-  private table?: Table<SingleGeneralState>;
+  private table?: Table<Features, SingleGeneralState>;
   @state() private tableData: SingleGeneralState[] = [];
-  private tableController = new TableController<SingleGeneralState>(this);
+  private tableController = new TableController<Features, SingleGeneralState>(
+    this,
+  );
 
   private data?: data.SingleData;
 
@@ -102,90 +112,87 @@ export class SingleTable extends LitElement {
     this.columns = this.generateColumns();
   }
 
-  protected generateColumns: () => ColumnDef<SingleGeneralState>[] = () => {
-    const columns: ColumnDef<SingleGeneralState>[] = [
-      {
-        id: 'rowIndex',
-        header: '#',
-        enableSorting: false,
-        enableResizing: false,
-        minSize: 48,
-        size: 56,
-        maxSize: 64,
-        meta: { isIndex: true }, // handy flag for render branch
-      },
-    ];
+  protected generateColumns: () => ColumnDef<Features, SingleGeneralState>[] =
+    () => {
+      const columns: ColumnDef<Features, SingleGeneralState>[] = [
+        {
+          id: 'rowIndex',
+          header: '#',
+          enableSorting: false,
+          meta: { isIndex: true }, // handy flag for render branch
+        },
+      ];
 
-    const dynamicColumns = Array.from(tableHeaders.keys())
-      .filter((key) => {
-        if (this.generalType === 'mayor') {
-          if (
-            key === 'marchbuff' ||
-            key === 'attackbuff' ||
-            key === 'defensebuff' ||
-            key === 'hpbuff'
-          ) {
-            return false;
-          }
-        } else if (this.generalType === 'wall') {
-          if (key === 'marchbuff') {
-            return false;
-          }
-        }
-        return true;
-      })
-      .map((key) => {
-        const accessorFn = (row: SingleGeneralState) => {
-          if (key === 'primary') return row.primary;
-          else {
-            if (!row.data) {
-              return undefined;
+      const dynamicColumns = Array.from(tableHeaders.keys())
+        .filter((key) => {
+          if (this.generalType === 'mayor') {
+            if (
+              key === 'marchbuff' ||
+              key === 'attackbuff' ||
+              key === 'defensebuff' ||
+              key === 'hpbuff'
+            ) {
+              return false;
             }
-            return row.data[key as keyof typeof row.data];
+          } else if (this.generalType === 'wall') {
+            if (key === 'marchbuff') {
+              return false;
+            }
           }
-        };
-        return {
-          id: key,
-          accessorFn,
-          enableSorting: true,
-          sortUndefined: 'last',
-          sortDescFirst: key !== 'primary',
-          cell: (info: CellContext<SingleGeneralState, unknown>) => {
-            const value = info.getValue();
-            return typeof value === 'number'
-              ? value.toLocaleString()
-              : (value ?? '');
-          },
-          header: (info: HeaderContext<SingleGeneralState, unknown>) => {
-            const sortIndex = info.table
-              .getState()
-              .sorting.findIndex((s) => s.id === info.column.id);
-            const direction = info.column.getIsSorted();
-            const showArrow =
-              direction === 'asc' ? '🔼' : direction === 'desc' ? '🔽' : '';
-            return html`<div
-              class="table-header-sort"
-              @click=${info.column.getToggleSortingHandler()}
-            >
-              ${tableHeaders.get(key) ?? key}
-              ${direction
-                ? html`<span class="table-header-sort">
-                    <span>${showArrow}</span>
-                    ${sortIndex > -1
-                      ? html`<span class="table-header-sort-index"
-                          >${sortIndex + 1}</span
-                        >`
-                      : null}
-                  </span>`
-                : null}
-            </div>`;
-          },
-        } as ColumnDef<SingleGeneralState>;
-      });
+          return true;
+        })
+        .map((key): ColumnDef<Features, SingleGeneralState> => {
+          const accessorFn = (row: SingleGeneralState) => {
+            if (key === 'primary') return row.primary;
+            else {
+              if (!row.data) {
+                return undefined;
+              }
+              return row.data[key as keyof typeof row.data];
+            }
+          };
+          return {
+            id: key,
+            accessorFn,
+            enableSorting: true,
+            sortUndefined: 'last',
+            sortDescFirst: key !== 'primary',
+            cell: (info: CellContext<Features, SingleGeneralState>) => {
+              const value = info.getValue();
+              return typeof value === 'number'
+                ? value.toLocaleString()
+                : (value ?? '');
+            },
+            header: (info: HeaderContext<Features, SingleGeneralState>) => {
+              const sortIndex = info.table.store.state.sorting.findIndex(
+                (s) => s.id === info.column.id,
+              );
+              const direction = info.column.getIsSorted();
+              const showArrow =
+                direction === 'asc' ? '🔼' : direction === 'desc' ? '🔽' : '';
+              return html`<div
+                class="table-header-sort"
+                @click=${info.column.getToggleSortingHandler()}
+              >
+                ${tableHeaders.get(key) ?? key}
+                ${direction
+                  ? html`<span class="table-header-sort">
+                      <span>${showArrow}</span>
+                      ${sortIndex > -1
+                        ? html`<span class="table-header-sort-index"
+                            >${sortIndex + 1}</span
+                          >`
+                        : null}
+                    </span>`
+                  : null}
+              </div>`;
+            },
+          };
+        });
 
-    columns.push(...dynamicColumns);
-    return columns;
-  };
+      columns.push(...dynamicColumns);
+      return columns;
+    };
 
   protected updateTableData = () => {
     if (!this.data) return;
@@ -213,6 +220,8 @@ export class SingleTable extends LitElement {
     }
 
     this.table = this.tableController.table({
+      features,
+      rowModels,
       columns: this.columns,
       data: this.tableData,
       state: { sorting: this._sorting },
@@ -223,8 +232,6 @@ export class SingleTable extends LitElement {
             : updaterOrValue;
         this.requestUpdate();
       },
-      getSortedRowModel: getSortedRowModel(),
-      getCoreRowModel: getCoreRowModel(),
     });
 
     return html`
@@ -284,7 +291,7 @@ export class SingleTable extends LitElement {
                   title=${title}
                 >
                   ${repeat(
-                    row.getVisibleCells(),
+                    row.getAllCells(),
                     (cell) => cell.id,
                     (cell) =>
                       cell.column.id === 'rowIndex'

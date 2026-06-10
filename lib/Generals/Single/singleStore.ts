@@ -143,7 +143,7 @@ export class GeneralStore {
       return {
         ...prev,
         rows,
-      } as GeneralState;
+      };
     });
   }
 
@@ -232,7 +232,7 @@ export class GeneralStore {
         };
       });
 
-      return { ...prev, rows } as GeneralState;
+      return { ...prev, rows };
     });
   }
 

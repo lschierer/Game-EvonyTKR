@@ -167,7 +167,7 @@ export class PairStore {
       return {
         ...prev,
         rows,
-      } as PairsState;
+      };
     });
   }
 
@@ -258,7 +258,7 @@ export class PairStore {
         };
       });
 
-      return { ...prev, rows } as PairsState;
+      return { ...prev, rows };
     });
   }
 

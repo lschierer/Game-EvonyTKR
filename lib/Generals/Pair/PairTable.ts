@@ -19,8 +19,10 @@ import SpectrumProgressBarCSS from '@spectrum-css/progressbar/dist/index.css' wi
 import GeneralTableCSS from '../../../share/public/css/GeneralTable.css' with { type: 'css' };
 
 import {
-  getCoreRowModel,
-  getSortedRowModel,
+  createSortedRowModel,
+  rowSortingFeature,
+  sortFns,
+  tableFeatures,
   TableController,
   type ColumnDef,
   type SortingState,
@@ -32,6 +34,12 @@ import {
 
 import type * as data from './data';
 import { type RowEntry, pairKey } from './pairStore';
+
+const features = tableFeatures({ rowSortingFeature });
+type Features = typeof features;
+const rowModels = {
+  sortedRowModel: createSortedRowModel<Features, RowEntry>(sortFns),
+};
 
 const tableHeaders = new Map<string, string>([
   ['primary', 'Primary'],
@@ -61,11 +69,11 @@ export class PairTable extends LitElement {
   @property({ type: String }) public allowedBuffActivation: string = 'Overall';
 
   @state() private _sorting: SortingState = [];
-  @state() private columns: ColumnDef<RowEntry>[] = [];
+  @state() private columns: ColumnDef<Features, RowEntry>[] = [];
 
-  private table?: Table<RowEntry>;
+  private table?: Table<Features, RowEntry>;
   @state() private tableData: RowEntry[] = [];
-  private tableController = new TableController<RowEntry>(this);
+  private tableController = new TableController<Features, RowEntry>(this);
 
   private data?: data.PairData;
 
@@ -106,16 +114,12 @@ export class PairTable extends LitElement {
     this.columns = this.generateColumns();
   }
 
-  protected generateColumns: () => ColumnDef<RowEntry>[] = () => {
-    const columns: ColumnDef<RowEntry>[] = [
+  protected generateColumns: () => ColumnDef<Features, RowEntry>[] = () => {
+    const columns: ColumnDef<Features, RowEntry>[] = [
       {
         id: 'rowIndex',
         header: '#',
         enableSorting: false,
-        enableResizing: false,
-        minSize: 48,
-        size: 56,
-        maxSize: 64,
         meta: { isIndex: true }, // handy flag for render branch
       },
     ];
@@ -138,7 +142,7 @@ export class PairTable extends LitElement {
         }
         return true;
       })
-      .map((key) => {
+      .map((key): ColumnDef<Features, RowEntry> => {
         const accessorFn = (row: RowEntry) => {
           if (key === 'primary') return row.primary;
           else if (key === 'secondary') return row.secondary;
@@ -155,16 +159,16 @@ export class PairTable extends LitElement {
           enableSorting: true,
           sortUndefined: 'last',
           sortDescFirst: key !== 'primary' && key !== 'secondary',
-          cell: (info: CellContext<RowEntry, unknown>) => {
+          cell: (info: CellContext<Features, RowEntry>) => {
             const value = info.getValue();
             return typeof value === 'number'
               ? value.toLocaleString()
               : (value ?? '');
           },
-          header: (info: HeaderContext<RowEntry, unknown>) => {
-            const sortIndex = info.table
-              .getState()
-              .sorting.findIndex((s) => s.id === info.column.id);
+          header: (info: HeaderContext<Features, RowEntry>) => {
+            const sortIndex = info.table.store.state.sorting.findIndex(
+              (s) => s.id === info.column.id,
+            );
             const direction = info.column.getIsSorted();
             const showArrow =
               direction === 'asc' ? '🔼' : direction === 'desc' ? '🔽' : '';
@@ -185,7 +189,7 @@ export class PairTable extends LitElement {
                 : null}
             </div>`;
           },
-        } as ColumnDef<RowEntry>;
+        };
       });
 
     columns.push(...dynamicColumns);
@@ -223,6 +227,8 @@ export class PairTable extends LitElement {
     }
 
     this.table = this.tableController.table({
+      features,
+      rowModels,
       columns: this.columns,
       data: this.tableData,
       state: { sorting: this._sorting },
@@ -233,8 +239,6 @@ export class PairTable extends LitElement {
             : updaterOrValue;
         this.requestUpdate();
       },
-      getSortedRowModel: getSortedRowModel(),
-      getCoreRowModel: getCoreRowModel(),
     });
 
     return html`
@@ -294,7 +298,7 @@ export class PairTable extends LitElement {
                   title=${title}
                 >
                   ${repeat(
-                    row.getVisibleCells(),
+                    row.getAllCells(),
                     (cell) => cell.id,
                     (cell) =>
                       cell.column.id === 'rowIndex'
