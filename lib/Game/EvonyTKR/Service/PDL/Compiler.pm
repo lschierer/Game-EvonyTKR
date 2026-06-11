@@ -326,20 +326,40 @@ sub _get_troop_type ($self, $type_array) {
   return $type_array;
 }
 
+# One in-game wall-general effect is often encoded as several per-troop buff
+# entries differing only in targetedType (e.g. "ranged troops and siege
+# machines' attack +20%" is two YAML entries). When collapsing those into the
+# 'all' columns they must count once. $scope keeps cumulative sources
+# (covenant/specialty levels, generic books) from deduping across levels.
+sub _is_wall_duplicate ($self, $seen, $scope, $buff, $is_debuff, $troop_type) {
+  return 0 unless $troop_type eq 'wall' && !$is_debuff;
+  return 0
+    unless ($buff->{targetedType} // '') =~ /ground|mounted|ranged|siege/i;
+  my $sig = join "\x1f", $scope, lc($buff->{attribute} // ''),
+    ($buff->{value}{number} // 0),
+    sort @{ $buff->{conditions} || [] };
+  return $seen->{$sig}++ ? 1 : 0;
+}
+
 sub _compile_book_buffs ($self, $book_data, $activation_type, $troop_type) {
   my $row = zeros(scalar @BUFF_COLUMNS);
 
+  my %seen_wall;
   for my $buff (@{ $book_data->{buffs} || [] }) {
     next unless $self->_buff_applies($buff, $activation_type, $troop_type);
 
     # Check if this is a debuff (Enemy condition)
     my $is_debuff = grep { $_ eq 'Enemy' } @{ $buff->{conditions} || [] };
 
-    my $column_key = $self->_get_buff_column_key($buff, $is_debuff);
+    my $column_key = $self->_get_buff_column_key($buff, $is_debuff, $troop_type);
     next unless defined $column_key && exists $BUFF_INDEX{$column_key};
+    next
+      if $self->_is_wall_duplicate(\%seen_wall, '', $buff, $is_debuff,
+      $troop_type);
 
-    my $value = $buff->{value}{number} || 0;
-    $row->set($BUFF_INDEX{$column_key}, $value);
+    my $value   = $buff->{value}{number} || 0;
+    my $current = $row->at($BUFF_INDEX{$column_key});
+    $row->set($BUFF_INDEX{$column_key}, $current + $value);
   }
 
   return $row;
@@ -371,6 +391,7 @@ sub _compile_ascending_buffs ($self, $asc_data, $level, $activation_type,
 
   return $row unless $level_data;
 
+  my %seen_wall;
   for my $buff (@{ $level_data->{buffs} || [] }) {
     next unless $self->_buff_applies($buff, $activation_type, $troop_type);
 
@@ -379,11 +400,15 @@ sub _compile_ascending_buffs ($self, $asc_data, $level, $activation_type,
     my $is_debuff =
       grep { $_ eq 'Enemy' || $_ eq 'Monsters' } @{ $buff->{conditions} || [] };
 
-    my $column_key = $self->_get_buff_column_key($buff, $is_debuff);
+    my $column_key = $self->_get_buff_column_key($buff, $is_debuff, $troop_type);
     next unless defined $column_key && exists $BUFF_INDEX{$column_key};
+    next
+      if $self->_is_wall_duplicate(\%seen_wall, '', $buff, $is_debuff,
+      $troop_type);
 
-    my $value = $buff->{value}{number} || 0;
-    $row->set($BUFF_INDEX{$column_key}, $value);
+    my $value   = $buff->{value}{number} || 0;
+    my $current = $row->at($BUFF_INDEX{$column_key});
+    $row->set($BUFF_INDEX{$column_key}, $current + $value);
   }
 
   return $row;
@@ -404,6 +429,7 @@ sub _compile_covenant_buffs ($self, $cov_data, $level, $activation_type,
   return $row unless defined $selected_rank;
 
   # Accumulate buffs from all levels up to and including selected level
+  my %seen_wall;
   for my $cov (@{ $cov_data->{levels} || [] }) {
     my $cov_level_name = lc($cov->{category} || '');
     my $cov_rank       = $level_rank{$cov_level_name};
@@ -417,8 +443,12 @@ sub _compile_covenant_buffs ($self, $cov_data, $level, $activation_type,
       # Check if this is a debuff (Enemy condition)
       my $is_debuff = grep { $_ eq 'Enemy' } @{ $buff->{conditions} || [] };
 
-      my $column_key = $self->_get_buff_column_key($buff, $is_debuff);
+      my $column_key =
+        $self->_get_buff_column_key($buff, $is_debuff, $troop_type);
       next unless defined $column_key && exists $BUFF_INDEX{$column_key};
+      next
+        if $self->_is_wall_duplicate(\%seen_wall, $cov_level_name, $buff,
+        $is_debuff, $troop_type);
 
       my $value   = $buff->{value}{number} || 0;
       my $current = $row->at($BUFF_INDEX{$column_key});
@@ -444,6 +474,7 @@ sub _compile_specialty_buffs ($self, $spec_data, $level, $activation_type,
   return $row unless defined $selected_rank;
 
   # Accumulate buffs from all levels up to and including selected level
+  my %seen_wall;
   for my $spec_level (@{ $spec_data->{levels} || [] }) {
     my $spec_level_name = lc($spec_level->{level} || '');
     my $spec_rank       = $level_rank{$spec_level_name};
@@ -457,8 +488,12 @@ sub _compile_specialty_buffs ($self, $spec_data, $level, $activation_type,
       # Check if this is a debuff (Enemy condition)
       my $is_debuff = grep { $_ eq 'Enemy' } @{ $buff->{conditions} || [] };
 
-      my $column_key = $self->_get_buff_column_key($buff, $is_debuff);
+      my $column_key =
+        $self->_get_buff_column_key($buff, $is_debuff, $troop_type);
       next unless defined $column_key && exists $BUFF_INDEX{$column_key};
+      next
+        if $self->_is_wall_duplicate(\%seen_wall, $spec_level_name, $buff,
+        $is_debuff, $troop_type);
 
       my $value   = $buff->{value}{number} || 0;
       my $current = $row->at($BUFF_INDEX{$column_key});
@@ -547,6 +582,7 @@ sub _select_best_generic_books_simple ($self, $general, $activation_type,
 # Load and sum buffs from selected books
 # Note: Generic book filenames include the level (e.g., "Level 4 Ground Troop Attack.yaml")
   my $books_dir = path($self->data_dir, 'generic books');
+  my %seen_wall;
   foreach my $book_name (@selected_books) {
     # book_name already has "Level X" prefix (e.g., "Level 4 March Size")
     # But we need to use the correct level from book_level_num
@@ -567,9 +603,13 @@ sub _select_best_generic_books_simple ($self, $general, $activation_type,
     foreach my $buff (@{ $book_data->{buffs} || [] }) {
       next unless $self->_buff_applies($buff, $activation_type, $troop_type);
 
-      my $is_debuff  = grep { $_ eq 'Enemy' } @{ $buff->{conditions} || [] };
-      my $column_key = $self->_get_buff_column_key($buff, $is_debuff);
+      my $is_debuff = grep { $_ eq 'Enemy' } @{ $buff->{conditions} || [] };
+      my $column_key =
+        $self->_get_buff_column_key($buff, $is_debuff, $troop_type);
       next unless defined $column_key && exists $BUFF_INDEX{$column_key};
+      next
+        if $self->_is_wall_duplicate(\%seen_wall, $full_book_name, $buff,
+        $is_debuff, $troop_type);
 
       my $value = $buff->{value}{number} || 0;
       $buffs{$column_key} += $value;
@@ -620,7 +660,7 @@ sub _buff_applies ($self, $buff, $activation_type, $troop_type) {
   return 0;
 }
 
-sub _get_buff_column_key ($self, $buff, $is_debuff = 0) {
+sub _get_buff_column_key ($self, $buff, $is_debuff = 0, $troop_type = '') {
   my $attribute     = lc($buff->{attribute} || '');
   my $targeted_type = $buff->{targetedType} || '';
 
@@ -657,6 +697,12 @@ sub _get_buff_column_key ($self, $buff, $is_debuff = 0) {
     elsif ($targeted_type =~ /siege/i) {
       $suffix = 'siege';
     }
+
+# Wall generals defend with all troop types at once, so their troop-specific
+# buffs are collapsed into the 'all' columns ("dropping the adjectives").
+# Debuffs stay broken out per troop type. See _is_wall_duplicate for the
+# double-count guard.
+    $suffix = 'all' if !$is_debuff && $troop_type eq 'wall';
 
     $column_key = "${buff_type}_${suffix}";
   }

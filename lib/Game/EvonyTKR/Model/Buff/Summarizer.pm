@@ -467,7 +467,7 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
         'When City Mayor for this SubCity',
         'In Main City',
         'In City',
-        'When the Main Defense General',
+        'When The Main Defense General',
         'you own the General',
         'leading the army',
       ],

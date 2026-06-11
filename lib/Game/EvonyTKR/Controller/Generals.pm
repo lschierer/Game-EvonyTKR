@@ -1045,12 +1045,15 @@ package Game::EvonyTKR::Controller::Generals {
 
   # Helper: Convert troop suffix to display name
   sub _troop_type_from_suffix ($self, $suffix) {
+# Wall generals' buffs are compiled into the 'all' columns (see PDL::Compiler
+# _get_buff_column_key), so every troop-type entry carries the same value and
+# any key works for extraction.
     my %map = (
       ground  => 'Ground Troops',
       mounted => 'Mounted Troops',
       ranged  => 'Ranged Troops',
       siege   => 'Siege Machines',
-      wall    => 'Wall',
+      wall    => 'Ground Troops',
     );
     return $map{$suffix} // 'Ground Troops';
   }
