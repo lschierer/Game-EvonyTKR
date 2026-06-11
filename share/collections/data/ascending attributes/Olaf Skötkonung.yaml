@@ -5,19 +5,19 @@ ascending:
     text: Attacking Siege Machine Attack, Defense and HP +10%
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
           number: 10
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
           number: 10
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
@@ -35,13 +35,13 @@ ascending:
     text: Attacking Siege Machine Attack and Defense +30%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
           number: 30
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
@@ -50,7 +50,7 @@ ascending:
     text: Attacking Siege Machine HP +30%, March Size Capacity +10%.
     buffs:
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
@@ -62,22 +62,22 @@ ascending:
     text: Attacking Ranged Troop and Siege Machine Attack +45%; Siege Machine Defense and HP +30%.
     buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
           number: 45
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
           number: 45
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 30
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 30

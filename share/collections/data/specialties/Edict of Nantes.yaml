@@ -7,15 +7,15 @@ levels:
       Mounted Troop HP +4%.
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 5
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 4
       - attribute: HP
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 4
   - level: blue
@@ -25,15 +25,15 @@ levels:
       Mounted Troop HP +4%.
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 6
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 4
       - attribute: HP
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 4
   - level: purple
@@ -43,15 +43,15 @@ levels:
       Mounted Troop HP +9%.
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 11
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 9
       - attribute: HP
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 9
   - level: orange
@@ -61,15 +61,15 @@ levels:
       Mounted Troop HP +9%.
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 11
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 9
       - attribute: HP
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 9
   - level: gold
@@ -79,14 +79,14 @@ levels:
       Mounted Troop HP +18%.
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 22
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 18
       - attribute: HP
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 18

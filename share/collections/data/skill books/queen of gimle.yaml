@@ -3,16 +3,16 @@ text: >-
   Increases siege machines' attack, defense and HP by 40% and March Size by 8% when General is leading the army.
 buffs:
   - attribute: Attack
-    troop: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 40
       unit: percentage
   - attribute: Defense
-    troop: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 40
   - attribute: HP
-    troop: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 40
   - attribute: March Size

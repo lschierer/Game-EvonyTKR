@@ -1,13 +1,13 @@
 ascending:
   - buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 10
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 10
         conditions:
@@ -25,7 +25,7 @@ ascending:
     text: Attacking Troop Death into Wounded Rate +8%
   - buffs:
       - attribute: Attack
-        class: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
@@ -37,19 +37,19 @@ ascending:
     text: When attacking, Ranged Troop Attack +15%, March Size Capacity +6%
   - buffs:
       - attribute: Attack
-        class: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
           number: 15
       - attribute: Attack
-        class: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
           number: 15
       - attribute: HP
-        class: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
@@ -58,13 +58,13 @@ ascending:
     text: When attacking, Ranged Troop and Siege Machine Attack +15%, Ranged Troop HP +15%
   - buffs:
       - attribute: Attack
-        class: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
           number: 35
       - attribute: Defense
-        class: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:

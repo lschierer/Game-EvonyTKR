@@ -5,25 +5,25 @@ ascending:
     text: Attacking Ground Troop and Mounted Troop Defense and HP +10%
     buffs:
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 10
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 10
         conditions:
           - Attacking
       - attribute: HP
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 10
         conditions:
           - Attacking
       - attribute: HP
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 10
         conditions:
@@ -41,7 +41,7 @@ ascending:
     text: Attacking Ground Troop Attack +25%, March Size Capacity +5%
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 25
         conditions:
@@ -53,13 +53,13 @@ ascending:
     text: Attacking Ground Troop Attack +25% and HP +20%
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 25
         conditions:
           - Attacking
       - attribute: HP
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 20
         conditions:
@@ -68,13 +68,13 @@ ascending:
     text: When attacking, Ground Troop Attack and Defense +35%, March Size Capacity +8%
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 35
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 35
         conditions:

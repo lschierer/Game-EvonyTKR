@@ -3,12 +3,12 @@ levels:
   - level: Green
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 4
           unit: percentage
@@ -19,12 +19,12 @@ levels:
   - level: Blue
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 5
           unit: percentage
@@ -35,12 +35,12 @@ levels:
   - level: Purple
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 9
           unit: percentage
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 9
           unit: percentage
@@ -51,12 +51,12 @@ levels:
   - level: Orange
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 9
           unit: percentage
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 9
           unit: percentage
@@ -67,12 +67,12 @@ levels:
   - level: Gold
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 18
           unit: percentage
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 18
           unit: percentage

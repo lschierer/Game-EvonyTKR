@@ -4,27 +4,27 @@ levels:
     text: Siege Machine Attack +4%. Ranged Troop and Siege Machine Defense +2%. Ranged Troop and Siege Machine HP +2%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 2
           unit: percentage
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 2
           unit: percentage
@@ -32,27 +32,27 @@ levels:
     text: Siege Machine Attack +4%. Ranged Troop and Siege Machine Defense +3%. Ranged Troop and Siege Machine HP +3%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 3
           unit: percentage
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 3
           unit: percentage
@@ -60,27 +60,27 @@ levels:
     text: Siege Machine Attack +8%. Ranged Troop and Siege Machine Defense +5%. Ranged Troop and Siege Machine HP +5%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 8
           unit: percentage
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
@@ -88,27 +88,27 @@ levels:
     text: Siege Machine Attack +8%. Ranged Troop and Siege Machine Defense +5%. Ranged Troop and Siege Machine HP +5%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 8
           unit: percentage
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
@@ -116,27 +116,27 @@ levels:
     text: Siege Machine Attack +16%. Ranged Troop and Siege Machine Defense +10%. Ranged Troop and Siege Machine HP +10%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 16
           unit: percentage
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage

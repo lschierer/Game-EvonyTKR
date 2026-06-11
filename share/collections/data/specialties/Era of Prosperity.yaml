@@ -2,31 +2,31 @@ name: Era of Prosperity
 levels:
   - buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 5
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 4
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 4
         conditions:
           - Attacking
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 4
         conditions:
           - Attacking
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 4
         conditions:
@@ -38,31 +38,31 @@ levels:
       Attacking Ranged Troop and Siege Machine HP +4%.
   - buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 6
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 4
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 4
         conditions:
           - Attacking
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 4
         conditions:
           - Attacking
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 4
         conditions:
@@ -74,31 +74,31 @@ levels:
       Attacking Ranged Troop and Siege Machine HP +4%.
   - buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 11
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 8
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 8
         conditions:
           - Attacking
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 8
         conditions:
           - Attacking
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 8
         conditions:
@@ -110,31 +110,31 @@ levels:
       Attacking Ranged Troop and Siege Machine HP +8%.
   - buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 11
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 8
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 8
         conditions:
           - Attacking
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 8
         conditions:
           - Attacking
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 8
         conditions:
@@ -146,31 +146,31 @@ levels:
       Attacking Ranged Troop and Siege Machine HP +8%.
   - buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 22
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 16
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 16
         conditions:
           - Attacking
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 16
         conditions:
           - Attacking
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 16
         conditions:

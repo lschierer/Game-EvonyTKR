@@ -1,21 +1,21 @@
 ---
 buffs:
   - attribute: Attack
-    troop: Ranged Troops
+    targetedType: Ranged Troops
     value:
       number: 55
     conditions:
       - leading the army
       - Attacking
   - attribute: hp
-    troop: Ranged Troops
+    targetedType: Ranged Troops
     value:
       number: 55
     conditions:
       - leading the army
       - Attacking
   - attribute: Defense
-    troop: Ranged Troops
+    targetedType: Ranged Troops
     value:
       number: 40
     conditions:
@@ -23,7 +23,7 @@ buffs:
       - Attacking
       - brings a spiritual beast
   - attribute: Defense
-    troop: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 40
     conditions:

@@ -7,13 +7,13 @@ levels:
       March Size Capacity +1%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
           number: 5
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
@@ -28,13 +28,13 @@ levels:
       March Size Capacity +1%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
           number: 6
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
@@ -49,13 +49,13 @@ levels:
       March Size Capacity +1%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
           number: 11
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
@@ -70,13 +70,13 @@ levels:
       March Size Capacity +2%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
           number: 11
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
@@ -91,13 +91,13 @@ levels:
       March Size Capacity +3%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
           number: 22
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:

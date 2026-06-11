@@ -1,23 +1,23 @@
 ---
 buffs:
   - attribute: Attack
-    troop: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 40
   - attribute: Defense
-    troop: Ranged Troops
+    targetedType: Ranged Troops
     value:
       number: 25
   - attribute: Defense
-    troop: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 25
   - attribute: HP
-    troop: Ranged Troops
+    targetedType: Ranged Troops
     value:
       number: 25
   - attribute: HP
-    troop: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 25
 name: Rhine Staff

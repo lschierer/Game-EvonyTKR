@@ -8,14 +8,14 @@ levels:
     text: Siege Machine Attack +10%
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
   - category: cooperation
     text: Siege Machine Training Speed +10% (global).
     buffs:
       - attribute: Training Speed
-        troop: Siege Machines
+        targetedType: Siege Machines
         passive: 1
         value:
           number: 10
@@ -23,7 +23,7 @@ levels:
     text: Siege Machine Defense +10%
     buffs:
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
   - category: faith
@@ -32,13 +32,13 @@ levels:
       Reinforcing Siege Machine Attack +5%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
           number: 10
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Reinforcing
         value:
@@ -47,7 +47,7 @@ levels:
     text: Attacking Siege Machine Defense +10%.
     buffs:
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
@@ -58,7 +58,7 @@ levels:
       March Size Capacity +7%.
     buffs:
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:

@@ -7,19 +7,19 @@ levels:
       Attacking Ranged Troop HP +4%.
     buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
           number: 5
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
           number: 5
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
@@ -31,19 +31,19 @@ levels:
       Attacking Ranged Troop HP +4%.
     buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
           number: 6
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
           number: 6
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
@@ -55,19 +55,19 @@ levels:
       Attacking Ranged Troop HP +8%.
     buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
           number: 11
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
           number: 11
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
@@ -79,19 +79,19 @@ levels:
       Attacking Ranged Troop HP +8%.
     buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
           number: 11
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
           number: 11
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
@@ -103,19 +103,19 @@ levels:
       Attacking Ranged Troop HP +16%.
     buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
           number: 22
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
           number: 22
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:

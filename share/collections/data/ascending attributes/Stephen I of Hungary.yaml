@@ -5,13 +5,13 @@ ascending:
     text: Attacking Mounted Troop Defense and HP +15%
     buffs:
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 15
         conditions:
           - Attacking
       - attribute: HP
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 15
         conditions:
@@ -29,19 +29,19 @@ ascending:
     text: Attacking Mounted Troop Attack +25%, Attacking Ground Troop and Mounted Troop Defense +25%
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 25
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         conditions:
           - Attacking
         value:
           number: 25
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - Attacking
         value:
@@ -50,13 +50,13 @@ ascending:
     text: Attacking Ground Troop and Mounted Troop Attack +20%, March Size Capacity +10%
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 20
         conditions:
           - Attacking
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 20
         conditions:
@@ -68,19 +68,19 @@ ascending:
     text: Attacking Mounted Troop Attack, Defense, and HP +40%
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - Attacking
         value:
           number: 40
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - Attacking
         value:
           number: 40
       - attribute: HP
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - Attacking
         value:

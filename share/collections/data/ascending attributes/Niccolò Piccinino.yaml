@@ -5,11 +5,11 @@ ascending:
     text: Ground Troop Attack and HP +15%
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 15
       - attribute: HP
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 15
   - level: red2
@@ -24,30 +24,30 @@ ascending:
     text: Mounted Troop and Ground Troop Attack +20% and Defense +15%
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 20
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 20
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 15
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 15
   - level: red4
     text: Ground Troop and Mounted Troop HP +15%, March Size Capacity +8%
     buffs:
       - attribute: HP
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 15
       - attribute: HP
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 15
       - attribute: March Size
@@ -57,14 +57,14 @@ ascending:
     text: Ground Troop Attack, Defense, and HP +35%
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 35
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 35
       - attribute: HP
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 35

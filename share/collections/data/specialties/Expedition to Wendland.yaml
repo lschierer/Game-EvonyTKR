@@ -9,19 +9,19 @@ levels:
       - attribute: Attack
         conditions:
           - Attacking
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
       - attribute: Defense
         conditions:
           - Attacking
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
       - attribute: HP
         conditions:
           - Attacking
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 4
   - level: blue
@@ -33,19 +33,19 @@ levels:
       - attribute: Attack
         conditions:
           - Attacking
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 6
       - attribute: Defense
         conditions:
           - Attacking
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
       - attribute: HP
         conditions:
           - Attacking
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
   - level: purple
@@ -57,19 +57,19 @@ levels:
       - attribute: Attack
         conditions:
           - Attacking
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 11
       - attribute: Defense
         conditions:
           - Attacking
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 9
       - attribute: HP
         conditions:
           - Attacking
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 9
   - level: orange
@@ -81,19 +81,19 @@ levels:
       - attribute: Attack
         conditions:
           - Attacking
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 11
       - attribute: Defense
         conditions:
           - Attacking
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 9
       - attribute: HP
         conditions:
           - Attacking
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 9
   - level: gold
@@ -105,18 +105,18 @@ levels:
       - attribute: Attack
         conditions:
           - Attacking
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 2
       - attribute: Defense
         conditions:
           - Attacking
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 18
       - attribute: HP
         conditions:
           - Attacking
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 18

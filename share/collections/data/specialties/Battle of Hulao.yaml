@@ -7,15 +7,15 @@ levels:
       Ground Troop HP +2%.
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 3
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 2
       - attribute: HP
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 2
   - level: blue
@@ -25,15 +25,15 @@ levels:
       Ground Troop HP +3%.
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 4
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 3
       - attribute: HP
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 3
   - level: purple
@@ -43,15 +43,15 @@ levels:
       Ground Troop HP +5%.
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 7
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 5
       - attribute: HP
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 5
   - level: orange
@@ -61,15 +61,15 @@ levels:
       Ground Troop HP +5%.
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 7
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 5
       - attribute: HP
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 5
   - level: gold
@@ -79,14 +79,14 @@ levels:
       Ground Troop HP +10%.
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 14
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 10
       - attribute: HP
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 10

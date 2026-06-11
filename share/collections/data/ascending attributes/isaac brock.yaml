@@ -5,28 +5,28 @@ ascending:
       When General is the Main City Defense General, In-city Mounted Troop and Ground Troop Attack +5% and HP +5%.
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 5
         conditions:
           - When The Main Defense General
           - In City
       - attribute: HP
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 5
         conditions:
           - When The Main Defense General
           - In City
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 5
         conditions:
           - When The Main Defense General
           - In City
       - attribute: HP
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 5
         conditions:
@@ -42,7 +42,7 @@ ascending:
         conditions:
           - When The Main Defense General
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 5
         conditions:
@@ -52,28 +52,28 @@ ascending:
       When General is the Main City Defense General, In-city Ranged Troop and Siege Machine Defense +15% and HP +15%.
     buffs:
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 15
         conditions:
           - When The Main Defense General
           - In City
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 15
         conditions:
           - When The Main Defense General
           - In City
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 15
         conditions:
           - When The Main Defense General
           - In City
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 15
         conditions:
@@ -100,21 +100,21 @@ ascending:
       When General is the Main City Defense General, In-city Ground Troop Attack +40%, Defense and HP +20%.
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 40
         conditions:
           - When The Main Defense General
           - In City
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 20
         conditions:
           - When The Main Defense General
           - In City
       - attribute: HP
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 20
         conditions:

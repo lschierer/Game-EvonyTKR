@@ -7,15 +7,15 @@ levels:
       March Size Capacity +1%
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 4
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 4
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 4
       - attribute: March Size
@@ -28,15 +28,15 @@ levels:
       March Size Capacity +1%
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 5
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 5
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 5
       - attribute: March Size
@@ -49,15 +49,15 @@ levels:
       March Size Capacity +2%
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 9
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 9
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 9
       - attribute: March Size
@@ -70,15 +70,15 @@ levels:
       March Size Capacity +2%
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 9
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 9
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 9
       - attribute: March Size
@@ -91,15 +91,15 @@ levels:
       March Size Capacity +2%
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 18
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 18
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 18
       - attribute: March Size

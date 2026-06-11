@@ -4,21 +4,21 @@ levels:
     text: Attacking Siege Machine Attack +4%. Attacking Siege Machine Defense +2%. Attacking Siege Machine HP +2%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 4
           unit: percentage
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 2
           unit: percentage
         conditions:
           - Attacking
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 2
           unit: percentage
@@ -28,21 +28,21 @@ levels:
     text: Attacking Siege Machine Attack +4%. Attacking Siege Machine Defense +3%. Attacking Siege Machine HP +3%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 4
           unit: percentage
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 3
           unit: percentage
         conditions:
           - Attacking
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 3
           unit: percentage
@@ -52,21 +52,21 @@ levels:
     text: Attacking Siege Machine Attack +8%. Attacking Siege Machine Defense +5%. Attacking Siege Machine HP +5%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 8
           unit: percentage
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
         conditions:
           - Attacking
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
@@ -76,21 +76,21 @@ levels:
     text: Attacking Siege Machine Attack +8%. Attacking Siege Machine Defense +5%. Attacking Siege Machine HP +5%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 8
           unit: percentage
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
         conditions:
           - Attacking
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
@@ -100,21 +100,21 @@ levels:
     text: Attacking Siege Machine Attack +16%. Attacking Siege Machine Defense +10%. Attacking Siege Machine HP +10%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 16
           unit: percentage
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
         conditions:
           - Attacking
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage

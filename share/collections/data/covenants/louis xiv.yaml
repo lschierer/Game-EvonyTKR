@@ -9,7 +9,7 @@ levels:
       Mounted Troop HP +10%
     buffs:
       - attribute: HP
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 10
   - category: cooperation
@@ -17,7 +17,7 @@ levels:
       Mounted Troop Training Capacity +10% (global).
     buffs:
       - attribute: Training Capacity
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         passive: 1
         value:
           number: 10
@@ -26,7 +26,7 @@ levels:
       Mounted Troop Attack +5%
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 5
   - category: faith
@@ -35,13 +35,13 @@ levels:
       Mounted Troop Defense +5% (global).
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - When Rallying
         value:
           number: 10
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         passive: 1
         value:
           number: 5
@@ -57,13 +57,13 @@ levels:
       In-Rally Mounted Troop Defense +10%.
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - Attacking
         value:
           number: 10
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - When Rallying
         value:

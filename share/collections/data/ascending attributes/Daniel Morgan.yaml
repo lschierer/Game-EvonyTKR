@@ -5,15 +5,15 @@ ascending:
     text: Siege Machine Attack +10%, Defense and HP +5%
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
   - buffs:
@@ -30,13 +30,13 @@ ascending:
     text: When attacking, Ranged Troop and Siege Machine Defense +15%, March Size Capacity +5%.
     buffs:
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
           number: 15
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
@@ -48,13 +48,13 @@ ascending:
     text: Attacking Ranged Troop and Siege Machine Attack and HP +15%.
     buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:
           number: 15
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
@@ -63,11 +63,11 @@ ascending:
     text: Siege Machine Attack and HP +35%, March Size Capacity +5%
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 35
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 35
       - attribute: March Size

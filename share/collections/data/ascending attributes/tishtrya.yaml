@@ -5,19 +5,19 @@ ascending:
     text: Attacking Mounted Troop Attack +15%, Defense and HP +5%
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - Attacking
         value:
           number: 15
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - Attacking
         value:
           number: 5
       - attribute: HP
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - Attacking
         value:
@@ -36,7 +36,7 @@ ascending:
     text: When attacking, Mounted Troop Attack +30%, March Size Capacity +5%
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - Attacking
         value:
@@ -48,13 +48,13 @@ ascending:
     text: Attacking Mounted Troop Defense and HP +20%
     buffs:
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - Attacking
         value:
           number: 20
       - attribute: HP
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - Attacking
         value:
@@ -63,13 +63,13 @@ ascending:
     text: Attacking Mounted Troop Attack and Defense +45%, March Size Capacity +10%
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - Attacking
         value:
           number: 45
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - Attacking
         value:

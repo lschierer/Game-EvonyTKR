@@ -3,7 +3,7 @@ generals:
   - general: Hatshepsut
     buffs:
       - attribute: HP
-        class: Ground Troops
+        targetedType: Ground Troops
         passive: 1
         conditions:
           - Enemy
@@ -11,7 +11,7 @@ generals:
         value:
           number: 5
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         passive: 1
         conditions:
           - Enemy
@@ -19,7 +19,7 @@ generals:
         value:
           number: 5
       - attribute: Attack
-        class: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:

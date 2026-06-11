@@ -5,13 +5,13 @@ ascending:
     text: Attacking Siege Machine Defense and HP +15%.
     buffs:
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 15
         conditions:
           - Attacking
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 15
         conditions:
@@ -29,19 +29,19 @@ ascending:
     text: Attacking Siege Machine Attack +25%, Attacking Ranged Troop and Siege Machine Defense +25%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 25
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 25
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 25
         conditions:
@@ -50,25 +50,25 @@ ascending:
     text: Attacking Ranged Troop and Siege Machine Attack and HP +25%.
     buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 25
         conditions:
           - Attacking
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 25
         conditions:
           - Attacking
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 25
         conditions:
           - Attacking
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 25
         conditions:
@@ -77,13 +77,13 @@ ascending:
     text: Attacking Siege Machine Attack and Defense +35%, March Size Capacity +8%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 35
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 35
         conditions:

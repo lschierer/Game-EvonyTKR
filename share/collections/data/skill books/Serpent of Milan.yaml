@@ -3,19 +3,19 @@ text: >-
   Increases ranged troops' attack and defense by 60% and ranged troops' HP by 45% when General is leading the army.
 buffs:
   - attribute: Attack
-    troop: Ranged Troops
+    targetedType: Ranged Troops
     conditions:
       - leading the army
     value:
       number: 60
   - attribute: Defense
-    troop: Ranged Troops
+    targetedType: Ranged Troops
     conditions:
       - leading the army
     value:
       number: 60
   - attribute: HP
-    troop: Ranged Troops
+    targetedType: Ranged Troops
     conditions:
       - leading the army
     value:

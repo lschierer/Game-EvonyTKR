@@ -8,7 +8,7 @@ levels:
     text: Siege Machine Attack +5%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
   - category: cooperation
@@ -16,14 +16,14 @@ levels:
     buffs:
       - attribute: Training Capacity
         passive: 1
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
   - category: peace
     text: In-Rally Siege Machine Defense +10%.
     buffs:
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - When Rallying
         value:
@@ -34,14 +34,14 @@ levels:
       Attacking Siege Machine HP +10% (global).
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
           number: 10
       - attribute: HP
         passive: 1
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:
@@ -50,7 +50,7 @@ levels:
     text: In-Rally Siege Machine Attack +10%
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - When Rallying
         value:
@@ -61,7 +61,7 @@ levels:
       March Size Capacity +8%.
     buffs:
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
         value:

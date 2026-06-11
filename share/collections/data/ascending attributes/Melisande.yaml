@@ -4,12 +4,12 @@ ascending:
     text: Siege Machine Attack +10% and Defense +5%
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
@@ -17,7 +17,7 @@ ascending:
     text: Marching Troop Death into Wounded Rate +8%.
     buffs:
       - attribute: Death to Wounded
-        troop: ''
+        targetedType: ''
         value:
           number: 8
           unit: percentage
@@ -27,17 +27,17 @@ ascending:
     text: Siege Machine Attack +10%, Ranged Troop and Siege Machine HP +10%
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
@@ -45,22 +45,22 @@ ascending:
     text: Ranged Troop and Siege Machine Attack +20% and HP +10%
     buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 20
           unit: percentage
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 20
           unit: percentage
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
@@ -68,17 +68,17 @@ ascending:
     text: Siege Machine Attack +30%, Defense and HP +15%
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 30
           unit: percentage
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 15
           unit: percentage
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 15
           unit: percentage

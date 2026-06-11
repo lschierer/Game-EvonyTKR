@@ -8,7 +8,7 @@ levels:
     text: Ranged Troop Attack +5%.
     buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 5
   - category: cooperation
@@ -16,14 +16,14 @@ levels:
     buffs:
       - attribute: Training Capacity
         passive: 1
-        troop: Rannged Troops
+        targetedType: Rannged Troops
         value:
           number: 10
   - category: peace
     text: Ranged Troop HP +10%.
     buffs:
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 10
   - category: faith
@@ -32,11 +32,11 @@ levels:
       In-Rally Ranged Troop Attack +5% (global).
     buffs:
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 15
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - When Rallying
         passive: 1
@@ -46,7 +46,7 @@ levels:
     text: Attacking Ranged Troop Attack +15%.
     buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 15
   - category: civilization
@@ -55,7 +55,7 @@ levels:
       March Size Capacity +10%.
     buffs:
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - Attacking
         value:

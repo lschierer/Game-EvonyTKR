@@ -3,14 +3,14 @@ text: >-
   Reduces enemy ranged troops' attack by 35% and enemy mounted troops' HP by 35% when General is leading the army
 buffs:
   - attribute: Attack
-    troop: Ranged Troops
+    targetedType: Ranged Troops
     value:
       number: 35
     conditions:
       - Enemy
       - leading the army
   - attribute: HP
-    troop: Mounted Troops
+    targetedType: Mounted Troops
     value:
       number: 35
     conditions:

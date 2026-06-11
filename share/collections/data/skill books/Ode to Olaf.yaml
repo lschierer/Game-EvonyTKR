@@ -3,21 +3,21 @@ text: >-
   Increases siege machines' attack and defense by 60% and siege machines' HP by 45% when General is leading the army to attack.
 buffs:
   - attribute: Attack
-    troop: Siege Machines
+    targetedType: Siege Machines
     conditions:
       - Attacking
       - leading the army
     value:
       number: 60
   - attribute: Defense
-    troop: Siege Machines
+    targetedType: Siege Machines
     conditions:
       - Attacking
       - leading the army
     value:
       number: 60
   - attribute: HP
-    troop: Siege Machines
+    targetedType: Siege Machines
     conditions:
       - Attacking
       - leading the army

@@ -6,7 +6,7 @@ levels:
       When General brings any dragon March Size Capacity +1%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
           - brings a dragon
@@ -19,7 +19,7 @@ levels:
     text: When General brings any dragon Attacking Siege Machine Attack +3%. When General brings any dragon March Size Capacity +1%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
           - brings a dragon
@@ -32,7 +32,7 @@ levels:
     text: When General brings any dragon Attacking Siege Machine Attack +6%. When General brings any dragon March Size Capacity +2%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
           - brings a dragon
@@ -45,7 +45,7 @@ levels:
     text: When General brings any dragon Attacking Siege Machine Attack +6%. When General brings any dragon March Size Capacity +2%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
           - brings a dragon
@@ -58,7 +58,7 @@ levels:
     text: When General brings any dragon Attacking Siege Machine Attack +12%. When General brings any dragon March Size Capacity +4%.
     buffs:
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - Attacking
           - brings a dragon

@@ -27,14 +27,14 @@ buffs:
     value:
       number: 30
   - attribute: Attack
-    class: Ground Troops
+    targetedType: Ground Troops
     conditions:
       - When The Main Defense General
       - In City
     value:
       number: 20
   - attribute: Defense
-    class: Ground Troops
+    targetedType: Ground Troops
     conditions:
       - When The Main Defense General
       - In City

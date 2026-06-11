@@ -4,7 +4,7 @@ levels:
     text: In City Mounted Troop Attack +5% when General is the Main City Defense General. In City Mounted Troop HP +5% when General is the Main City Defense General.
     buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - In City
           - When The Main Defense General
@@ -12,7 +12,7 @@ levels:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - In City
           - When The Main Defense General
@@ -23,7 +23,7 @@ levels:
     text: In City Mounted Troop Attack +5% when General is the Main City Defense General. In City Mounted Troop HP +5% when General is the Main City Defense General.
     buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - In City
           - When The Main Defense General
@@ -31,7 +31,7 @@ levels:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - In City
           - When The Main Defense General
@@ -42,7 +42,7 @@ levels:
     text: In City Mounted Troop Attack +9% when General is the Main City Defense General. In City Mounted Troop HP +9% when General is the Main City Defense General.
     buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - In City
           - When The Main Defense General
@@ -50,7 +50,7 @@ levels:
           number: 9
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - In City
           - When The Main Defense General
@@ -61,7 +61,7 @@ levels:
     text: In City Mounted Troop Attack +9% when General is the Main City Defense General. In City Mounted Troop HP +9% when General is the Main City Defense General.
     buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - In City
           - When The Main Defense General
@@ -69,7 +69,7 @@ levels:
           number: 9
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - In City
           - When The Main Defense General
@@ -80,7 +80,7 @@ levels:
     text: In City Mounted Troop Attack +18% when General is the Main City Defense General. In City Mounted Troop HP +18% when General is the Main City Defense General.
     buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - In City
           - When The Main Defense General
@@ -88,7 +88,7 @@ levels:
           number: 18
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         conditions:
           - In City
           - When The Main Defense General

@@ -9,7 +9,7 @@ buffs:
       - Enemy
       - leading the army
   - attribute: Attack
-    troop: Mounted Troops
+    targetedType: Mounted Troops
     value:
       number: 20
     conditions:

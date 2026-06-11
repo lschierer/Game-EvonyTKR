@@ -93,21 +93,21 @@ ascending:
     text: When General is the Main City Defense General, In-city Mounted Troop HP +30% and In-city Ground Troop and Mounted Troop Defense +30%.
   - buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 20
         conditions:
           - When The Main Defense General
           - In City
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 30
         conditions:
           - When The Main Defense General
           - In City
       - attribute: HP
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 30
         conditions:

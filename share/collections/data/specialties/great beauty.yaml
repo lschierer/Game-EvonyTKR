@@ -8,7 +8,7 @@ levels:
           number: 1
           unit: percentage
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 1
           unit: percentage
@@ -20,7 +20,7 @@ levels:
           number: 1
           unit: percentage
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 1
           unit: percentage
@@ -32,7 +32,7 @@ levels:
           number: 2
           unit: percentage
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 2
           unit: percentage
@@ -44,7 +44,7 @@ levels:
           number: 2
           unit: percentage
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 2
           unit: percentage
@@ -56,7 +56,7 @@ levels:
           number: 4
           unit: percentage
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 4
           unit: percentage

@@ -3,21 +3,21 @@ text: >-
   Increases ground troops' attack and defense by 60% when General is leading the army to attack. Increases ground troops and mounted troops' HP by 45% when general brings any Dragon or Spiritual Beast to attack.
 buffs:
   - attribute: Attack
-    troop: Ground Troops
+    targetedType: Ground Troops
     value:
       number: 60
     conditions:
       - leading the army
       - Attacking
   - attribute: Defense
-    troop: Ground Troops
+    targetedType: Ground Troops
     value:
       number: 60
     conditions:
       - leading the army
       - Attacking
   - attribute: HP
-    troop: Ground Troops
+    targetedType: Ground Troops
     value:
       number: 45
     conditions:
@@ -25,7 +25,7 @@ buffs:
       - Attacking
       - brings a spiritual beast
   - attribute: HP
-    troop: Mounted Troops
+    targetedType: Mounted Troops
     value:
       number: 45
     conditions:

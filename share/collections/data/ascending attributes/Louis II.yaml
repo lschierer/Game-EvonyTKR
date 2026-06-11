@@ -6,19 +6,19 @@ ascending:
       Attacking Ground Troop Attack +15%, Defense and HP +10%
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 15
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 10
         conditions:
           - Attacking
       - attribute: HP
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 10
         conditions:
@@ -38,19 +38,19 @@ ascending:
       Attacking Ground Troop Attack +25%, Attacking Ground Troop and Mounted Troop Defense +25%
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 25
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         conditions:
           - Attacking
         value:
           number: 25
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 25
         conditions:
@@ -60,14 +60,14 @@ ascending:
       Attacking Mounted Troop and Ground Troop HP +25%, March Size Capacity +10%
     buffs:
       - attribute: HP
-        troop: Ground Troops
+        targetedType: Ground Troops
         conditions:
           - Attacking
         value:
           number: 25
           unit: percentage
       - attribute: HP
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 25
         conditions:
@@ -80,25 +80,25 @@ ascending:
       Attacking Mounted Troop and Ground Troop Attack +40%, Attacking Ground Troop Defense and HP +25%
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 40
         conditions:
           - Attacking
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 40
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 25
         conditions:
           - Attacking
       - attribute: HP
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 25
         conditions:

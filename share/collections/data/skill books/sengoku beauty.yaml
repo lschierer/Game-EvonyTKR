@@ -10,7 +10,7 @@ buffs:
       - In City
       - When The Main Defense General
   - attribute: HP
-    troop: Ground Troops
+    targetedType: Ground Troops
     value:
       number: 30
       unit: percentage

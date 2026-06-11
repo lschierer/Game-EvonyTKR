@@ -9,13 +9,13 @@ levels:
         conditions:
           - In City
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 4
         conditions:
           - In City
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 1
         conditions:
@@ -29,13 +29,13 @@ levels:
         conditions:
           - In City
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 4
         conditions:
           - In City
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 2
         conditions:
@@ -49,13 +49,13 @@ levels:
         conditions:
           - In City
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 8
         conditions:
           - In City
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 3
         conditions:
@@ -69,13 +69,13 @@ levels:
         conditions:
           - In City
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 8
         conditions:
           - In City
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 3
         conditions:
@@ -89,13 +89,13 @@ levels:
         conditions:
           - In City
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 16
         conditions:
           - In City
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 6
         conditions:

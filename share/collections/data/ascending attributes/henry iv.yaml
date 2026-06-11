@@ -5,11 +5,11 @@ ascending:
     text: Mounted Troop Defense and HP +20%.
     buffs:
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 20
       - attribute: HP
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 20
   - level: red2
@@ -24,40 +24,40 @@ ascending:
     text: Mounted Troop Attack +20%, Mounted Troop and Ground Troop HP +25%.
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 20
       - attribute: HP
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 25
       - attribute: HP
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 25
   - level: red4
     text: Attacking Ground Troop and Mounted Troop Attack and Defense +25%.
     buffs:
       - attribute: Attack
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 25
         conditions:
           - Attacking
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 25
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 25
         conditions:
           - Attacking
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 25
         conditions:
@@ -66,11 +66,11 @@ ascending:
     text: Mounted Troop Attack and Defense +40%, March Size Capacity +8%.
     buffs:
       - attribute: Attack
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 40
       - attribute: Defense
-        troop: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 40
       - attribute: March Size

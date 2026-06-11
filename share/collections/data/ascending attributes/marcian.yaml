@@ -5,19 +5,19 @@ ascending:
     text: Attacking Ranged Troop Attack, Defense and HP +10%
     buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - attacking
         value:
           number: 10
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - attacking
         value:
           number: 10
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - attacking
         value:
@@ -36,19 +36,19 @@ ascending:
     text: Attacking Ranged Troop Attack +25%, Attacking Ranged Troop and Siege Machine HP +20%
     buffs:
       - attribute: Attack
-        troop: Ranged Troop
+        targetedType: Ranged Troop
         conditions:
           - attacking
         value:
           number: 25
       - attribute: HP
-        troop: Ranged Troop
+        targetedType: Ranged Troop
         conditions:
           - attacking
         value:
           number: 20
       - attribute: HP
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - attacking
         value:
@@ -57,25 +57,25 @@ ascending:
     text: Attacking Ranged Troop and Siege Machine Attack and Defense +20%
     buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - attacking
         value: 
           number: 20
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - attacking
         value: 
           number: 20
       - attribute: Defense
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - attacking
         value: 
           number: 20
       - attribute: Defense
-        troop: Siege Machines
+        targetedType: Siege Machines
         conditions:
           - attacking
         value: 
@@ -84,13 +84,13 @@ ascending:
     text: Attacking Ranged Troop Attack and HP +35%, March Size Capacity +8%.
     buffs:
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - attacking
         value:
           number: 35
       - attribute: HP
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         conditions:
           - attacking
         value:

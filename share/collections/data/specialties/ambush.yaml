@@ -5,13 +5,13 @@ levels:
         value:
           number: 2
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 1
         conditions:
           - In City
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 1
         conditions:
@@ -23,13 +23,13 @@ levels:
         value:
           number: 2
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 1
         conditions:
           - In City
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 1
         conditions:
@@ -41,13 +41,13 @@ levels:
         value:
           number: 4
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 2
         conditions:
           - In City
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 2
         conditions:
@@ -59,13 +59,13 @@ levels:
         value:
           number: 4
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 2
         conditions:
           - In City
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 2
         conditions:
@@ -77,13 +77,13 @@ levels:
         value:
           number: 8
       - attribute: Attack
-        troop: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 4
         conditions:
           - In City
       - attribute: Attack
-        troop: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 4
         conditions:

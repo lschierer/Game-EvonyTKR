@@ -3,15 +3,15 @@ text: >-
   Increases mounted troops' attack and HP by 60% and increases mounted troops' defense by 45% when General is leading the army to attack.
 buffs:
   - attribute: Attack
-    troop: Mounted Troops
+    targetedType: Mounted Troops
     value:
       number: 60
   - attribute: HP
-    troop: Mounted Troops
+    targetedType: Mounted Troops
     value:
       number: 60
   - attribute: Defense
-    troop: Mounted Troops
+    targetedType: Mounted Troops
     condition:
       - Attacking
       - leading the army
