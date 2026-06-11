@@ -5,10 +5,10 @@ use Moo;
 use List::AllUtils qw( any uniq );
 use Scalar::Util   qw( refaddr );
 
-has 'service';    # parent service for constants
+has 'service' => (is => 'rw');    # parent service for constants
 
 # Cache non-conflicting buffs per general pair
-has '_non_conflicting_cache' => sub { {} };
+has '_non_conflicting_cache' => (is => 'rw', default => sub { {} });
 
 sub conflicts ($self, $b1, $b2, $g1, $g2) {
   return 0 if $b1->passive || $b2->passive;

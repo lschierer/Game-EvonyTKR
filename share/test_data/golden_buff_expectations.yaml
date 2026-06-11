@@ -1,375 +1,439 @@
+# Golden dataset pinning PDL compiler output (matrix level: mask x matrix,
+# no basic-attribute buffs) against regressions.
+# Regenerate with: perl scripts/regenerate_golden_expectations.pl
+# Values reviewed against in-game semantics: 3 generic books per general,
+# conflict-aware selection, debuffs stack across sources.
 ---
-# Golden dataset extracted from t/buff_summarizer_test.t
-# These are the expected buff values that the PDL implementation must match
-
 test_cases:
-  # Marco Polo Tests
-  - name: "Marco Polo - all none"
-    general: "Marco Polo"
-    isPrimary: true
-    targetType: "mounted_specialist"
-    activationType: "Attacking"
-    filters:
-      ascendingLevel: "none"
-      covenantLevel: "none"
-      specialty1: "none"
-      specialty2: "none"
-      specialty3: "none"
-      specialty4: "none"
-      generic1: "level4"
-      generic2: "level4"
-      generic3: "level4"
-      generic4: "level4"
-    expected_buffs:
-      Ground Troops:
-        March Size: 12
-        Attack: 0
-        Defense: 0
-        HP: 0
-      Mounted Troops:
-        March Size: 12
-        Attack: 70
-        Defense: 65
-        HP: 65
-      Ranged Troops:
-        March Size: 12
-        Attack: 0
-        Defense: 0
-        HP: 0
-      Siege Machines:
-        March Size: 12
-        Attack: 0
-        Defense: 0
-        HP: 0
-    expected_debuffs:
-      Ground Troops:
-        Attack: 0
-        Defense: 0
-        HP: 0
-      Mounted Troops:
-        Attack: 0
-        Defense: 0
-        HP: 0
-      Ranged Troops:
-        Attack: 0
-        Defense: 0
-        HP: 0
-      Siege Machines:
-        Attack: 0
-        Defense: 0
-        HP: 0
-
-  - name: "Marco Polo - red1 ascending"
-    general: "Marco Polo"
-    isPrimary: true
-    targetType: "mounted_specialist"
-    activationType: "Attacking"
-    filters:
-      ascendingLevel: "red1"
-      covenantLevel: "none"
-      specialty1: "none"
-      specialty2: "none"
-      specialty3: "none"
-      specialty4: "none"
-      generic1: "level4"
-      generic2: "level4"
-      generic3: "level4"
-      generic4: "level4"
-    expected_buffs:
-      Ground Troops:
-        March Size: 12
-        Attack: 0
-        Defense: 0
-        HP: 0
-      Mounted Troops:
-        March Size: 12
-        Attack: 95
-        Defense: 65
-        HP: 80
-      Ranged Troops:
-        March Size: 12
-        Attack: 0
-        Defense: 0
-        HP: 0
-      Siege Machines:
-        March Size: 12
-        Attack: 0
-        Defense: 0
-        HP: 0
-    expected_debuffs:
-      Ground Troops:
-        Attack: 0
-        Defense: 0
-        HP: 0
-      Mounted Troops:
-        Attack: 0
-        Defense: 0
-        HP: 0
-
-  - name: "Marco Polo - red5 ascending"
-    general: "Marco Polo"
-    isPrimary: true
-    targetType: "mounted_specialist"
-    activationType: "Attacking"
-    filters:
-      ascendingLevel: "red5"
-      covenantLevel: "none"
-      specialty1: "none"
-      specialty2: "none"
-      specialty3: "none"
-      specialty4: "none"
-      generic1: "level4"
-      generic2: "level4"
-      generic3: "level4"
-      generic4: "level4"
-    expected_buffs:
-      Ground Troops:
-        March Size: 20
-        Attack: 0
-        Defense: 0
-        HP: 0
-      Mounted Troops:
-        March Size: 20
-        Attack: 165
-        Defense: 90
-        HP: 105
-      Ranged Troops:
-        March Size: 20
-        Attack: 0
-        Defense: 0
-        HP: 0
-      Siege Machines:
-        March Size: 20
-        Attack: 0
-        Defense: 0
-        HP: 0
-    expected_debuffs:
-      Ground Troops:
-        Attack: 0
-        Defense: 10
-        HP: 10
-      Mounted Troops:
-        Attack: 0
-        Defense: 10
-        HP: 10
-
-  - name: "Marco Polo - gold specialty1"
-    general: "Marco Polo"
-    isPrimary: true
-    targetType: "mounted_specialist"
-    activationType: "Attacking"
-    filters:
-      ascendingLevel: "none"
-      covenantLevel: "none"
-      specialty1: "gold"
-      specialty2: "none"
-      specialty3: "none"
-      specialty4: "none"
-      generic1: "level4"
-      generic2: "level4"
-      generic3: "level4"
-      generic4: "level4"
-    expected_buffs:
-      Ground Troops:
-        March Size: 12
-        Attack: 0
-        Defense: 0
-        HP: 0
-      Mounted Troops:
-        March Size: 12
-        Attack: 80
-        Defense: 75
-        HP: 65
-      Ranged Troops:
-        March Size: 12
-        Attack: 0
-        Defense: 0
-        HP: 0
-      Siege Machines:
-        March Size: 12
-        Attack: 0
-        Defense: 0
-        HP: 0
-
-  - name: "Marco Polo - fully maxed"
-    general: "Marco Polo"
-    isPrimary: true
-    targetType: "mounted_specialist"
-    activationType: "Attacking"
-    filters:
-      ascendingLevel: "red5"
-      covenantLevel: "civilization"
-      specialty1: "gold"
-      specialty2: "gold"
-      specialty3: "gold"
-      specialty4: "gold"
-      generic1: "level4"
-      generic2: "level4"
-      generic3: "level4"
-      generic4: "level4"
-    expected_buffs:
-      Ground Troops:
-        March Size: 41
-        Attack: 10
-        Defense: 0
-        HP: 0
-      Mounted Troops:
-        March Size: 41
-        Attack: 250
-        Defense: 120
-        HP: 155
-      Ranged Troops:
-        March Size: 41
-        Attack: 0
-        Defense: 0
-        HP: 0
-      Siege Machines:
-        March Size: 41
-        Attack: 0
-        Defense: 0
-        HP: 0
-    expected_debuffs:
-      Ground Troops:
-        Attack: 0
-        Defense: 10
-        HP: 10
-      Mounted Troops:
-        Attack: 0
-        Defense: 10
-        HP: 10
-
-  # Aethelflaed Tests
-  # Note: Gets 3 generic books (not 6) due to conflict with built-in book
-  # Books: Mounted Attack, March Size, Mounted HP (not Defense)
-  - name: "Aethelflaed - all none"
-    general: "Aethelflaed"
-    isPrimary: true
-    targetType: "mounted_specialist"
-    activationType: "PvM"
-    filters:
-      ascendingLevel: "none"
-      covenantLevel: "none"
-      specialty1: "none"
-      specialty2: "none"
-      specialty3: "none"
-      specialty4: "none"
-      generic1: "level4"
-      generic2: "level4"
-      generic3: "level4"
-      generic4: "level4"
-    expected_buffs:
-      Ground Troops:
-        March Size: 12
-        Attack: 0
-        Defense: 0
-        HP: 0
-      Mounted Troops:
-        March Size: 12
-        Attack: 80
-        Defense: 80
-        HP: 25
-      Ranged Troops:
-        March Size: 12
-        Attack: 0
-        Defense: 0
-        HP: 0
-      Siege Machines:
-        March Size: 12
-        Attack: 0
-        Defense: 0
-        HP: 0
-    expected_debuffs:
-      Ground Troops:
-        Attack: 0
-        Defense: 0
-        HP: 0
-
-  - name: "Aethelflaed - fully maxed"
-    general: "Aethelflaed"
-    isPrimary: true
-    targetType: "mounted_specialist"
-    activationType: "PvM"
-    filters:
-      ascendingLevel: "red5"
-      covenantLevel: "Civilization"
-      specialty1: "gold"
-      specialty2: "gold"
-      specialty3: "gold"
-      specialty4: "gold"
-      generic1: "level4"
-      generic2: "level4"
-      generic3: "level4"
-      generic4: "level4"
-    expected_buffs:
-      Ground Troops:
-        March Size: 12
-        Attack: 45
-        Defense: 70
-        HP: 45
-      Mounted Troops:
-        March Size: 12
-        Attack: 170
-        Defense: 160
-        HP: 110
-      Ranged Troops:
-        March Size: 12
-        Attack: 15
-        Defense: 40
-        HP: 45
-      Siege Machines:
-        March Size: 12
-        Attack: 15
-        Defense: 40
-        HP: 45
-    expected_debuffs:
-      Ground Troops:
-        Attack: 10
-        Defense: 10
-        HP: 0
-      Mounted Troops:
-        Attack: 10
-        Defense: 10
-        HP: 0
-      Ranged Troops:
-        Attack: 10
-        Defense: 10
-        HP: 0
-      Siege Machines:
-        Attack: 10
-        Defense: 10
-        HP: 0
-
-  # Harald Tests (Mayor/Wall general)
-  - name: "Harald - fully maxed"
-    general: "Harald"
-    isPrimary: true
-    targetType: "mayor"
-    activationType: "Mayor"
-    filters:
-      ascendingLevel: "red5"
-      covenantLevel: "Civilization"
-      specialty1: "gold"
-      specialty2: "gold"
-      specialty3: "gold"
-      specialty4: "gold"
-      generic1: "none"
-      generic2: "none"
-      generic3: "none"
-      generic4: "none"
-    expected_debuffs:
-      Ground Troops:
-        Attack: 10
-        Defense: 40
-        HP: 10
-      Mounted Troops:
-        Attack: 10
-        Defense: 40
-        HP: 10
-      Ranged Troops:
-        Attack: 10
-        Defense: 40
-        HP: 10
-      Siege Machines:
-        Attack: 10
-        Defense: 40
-        HP: 10
+- activationType: Attacking
+  expected_buffs:
+    Ground Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 12
+    Mounted Troops:
+      Attack: 70
+      Defense: 40
+      HP: 65
+      March Size: 12
+    Ranged Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 12
+    Siege Machines:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 12
+  expected_debuffs:
+    Ground Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+    Mounted Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+    Ranged Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+    Siege Machines:
+      Attack: 0
+      Defense: 0
+      HP: 0
+  filters:
+    ascendingLevel: none
+    covenantLevel: none
+    generic1: level4
+    generic2: level4
+    generic3: level4
+    generic4: level4
+    specialty1: none
+    specialty2: none
+    specialty3: none
+    specialty4: none
+  general: Marco Polo
+  isPrimary: true
+  name: Marco Polo - all none
+  targetType: mounted_specialist
+- activationType: Attacking
+  expected_buffs:
+    Ground Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 12
+    Mounted Troops:
+      Attack: 95
+      Defense: 40
+      HP: 80
+      March Size: 12
+    Ranged Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 12
+    Siege Machines:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 12
+  expected_debuffs:
+    Ground Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+    Mounted Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+    Ranged Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+    Siege Machines:
+      Attack: 0
+      Defense: 0
+      HP: 0
+  filters:
+    ascendingLevel: red1
+    covenantLevel: none
+    generic1: level4
+    generic2: level4
+    generic3: level4
+    generic4: level4
+    specialty1: none
+    specialty2: none
+    specialty3: none
+    specialty4: none
+  general: Marco Polo
+  isPrimary: true
+  name: Marco Polo - red1 ascending
+  targetType: mounted_specialist
+- activationType: Attacking
+  expected_buffs:
+    Ground Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 20
+    Mounted Troops:
+      Attack: 165
+      Defense: 65
+      HP: 105
+      March Size: 20
+    Ranged Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 20
+    Siege Machines:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 20
+  expected_debuffs:
+    Ground Troops:
+      Attack: 0
+      Defense: 10
+      HP: 10
+    Mounted Troops:
+      Attack: 0
+      Defense: 10
+      HP: 10
+    Ranged Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+    Siege Machines:
+      Attack: 0
+      Defense: 0
+      HP: 0
+  filters:
+    ascendingLevel: red5
+    covenantLevel: none
+    generic1: level4
+    generic2: level4
+    generic3: level4
+    generic4: level4
+    specialty1: none
+    specialty2: none
+    specialty3: none
+    specialty4: none
+  general: Marco Polo
+  isPrimary: true
+  name: Marco Polo - red5 ascending
+  targetType: mounted_specialist
+- activationType: Attacking
+  expected_buffs:
+    Ground Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 12
+    Mounted Troops:
+      Attack: 80
+      Defense: 50
+      HP: 65
+      March Size: 12
+    Ranged Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 12
+    Siege Machines:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 12
+  expected_debuffs:
+    Ground Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+    Mounted Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+    Ranged Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+    Siege Machines:
+      Attack: 0
+      Defense: 0
+      HP: 0
+  filters:
+    ascendingLevel: none
+    covenantLevel: none
+    generic1: level4
+    generic2: level4
+    generic3: level4
+    generic4: level4
+    specialty1: gold
+    specialty2: none
+    specialty3: none
+    specialty4: none
+  general: Marco Polo
+  isPrimary: true
+  name: Marco Polo - gold specialty1
+  targetType: mounted_specialist
+- activationType: Attacking
+  expected_buffs:
+    Ground Troops:
+      Attack: 10
+      Defense: 0
+      HP: 0
+      March Size: 41
+    Mounted Troops:
+      Attack: 270
+      Defense: 95
+      HP: 155
+      March Size: 41
+    Ranged Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 41
+    Siege Machines:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 41
+  expected_debuffs:
+    Ground Troops:
+      Attack: 0
+      Defense: 10
+      HP: 10
+    Mounted Troops:
+      Attack: 0
+      Defense: 10
+      HP: 10
+    Ranged Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+    Siege Machines:
+      Attack: 0
+      Defense: 0
+      HP: 0
+  filters:
+    ascendingLevel: red5
+    covenantLevel: civilization
+    generic1: level4
+    generic2: level4
+    generic3: level4
+    generic4: level4
+    specialty1: gold
+    specialty2: gold
+    specialty3: gold
+    specialty4: gold
+  general: Marco Polo
+  isPrimary: true
+  name: Marco Polo - fully maxed
+  targetType: mounted_specialist
+- activationType: PvM
+  expected_buffs:
+    Ground Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 12
+    Mounted Troops:
+      Attack: 80
+      Defense: 55
+      HP: 45
+      March Size: 12
+    Ranged Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 12
+    Siege Machines:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 12
+  expected_debuffs:
+    Ground Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+    Mounted Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+    Ranged Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+    Siege Machines:
+      Attack: 0
+      Defense: 0
+      HP: 0
+  filters:
+    ascendingLevel: none
+    covenantLevel: none
+    generic1: level4
+    generic2: level4
+    generic3: level4
+    generic4: level4
+    specialty1: none
+    specialty2: none
+    specialty3: none
+    specialty4: none
+  general: Aethelflaed
+  isPrimary: true
+  name: Aethelflaed - all none
+  targetType: mounted_specialist
+- activationType: PvM
+  expected_buffs:
+    Ground Troops:
+      Attack: 45
+      Defense: 70
+      HP: 45
+      March Size: 12
+    Mounted Troops:
+      Attack: 170
+      Defense: 135
+      HP: 130
+      March Size: 12
+    Ranged Troops:
+      Attack: 15
+      Defense: 40
+      HP: 45
+      March Size: 12
+    Siege Machines:
+      Attack: 15
+      Defense: 40
+      HP: 45
+      March Size: 12
+  expected_debuffs:
+    Ground Troops:
+      Attack: 10
+      Defense: 10
+      HP: 0
+    Mounted Troops:
+      Attack: 10
+      Defense: 10
+      HP: 0
+    Ranged Troops:
+      Attack: 10
+      Defense: 10
+      HP: 0
+    Siege Machines:
+      Attack: 10
+      Defense: 10
+      HP: 0
+  filters:
+    ascendingLevel: red5
+    covenantLevel: Civilization
+    generic1: level4
+    generic2: level4
+    generic3: level4
+    generic4: level4
+    specialty1: gold
+    specialty2: gold
+    specialty3: gold
+    specialty4: gold
+  general: Aethelflaed
+  isPrimary: true
+  name: Aethelflaed - fully maxed
+  targetType: mounted_specialist
+- activationType: Mayor
+  expected_buffs:
+    Ground Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 0
+    Mounted Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 0
+    Ranged Troops:
+      Attack: 0
+      Defense: 0
+      HP: 0
+      March Size: 0
+    Siege Machines:
+      Attack: 10
+      Defense: 0
+      HP: 10
+      March Size: 0
+  expected_debuffs:
+    Ground Troops:
+      Attack: 20
+      Defense: 40
+      HP: 20
+    Mounted Troops:
+      Attack: 20
+      Defense: 40
+      HP: 20
+    Ranged Troops:
+      Attack: 20
+      Defense: 40
+      HP: 20
+    Siege Machines:
+      Attack: 20
+      Defense: 40
+      HP: 20
+  filters:
+    ascendingLevel: red5
+    covenantLevel: Civilization
+    generic1: none
+    generic2: none
+    generic3: none
+    generic4: none
+    specialty1: gold
+    specialty2: gold
+    specialty3: gold
+    specialty4: gold
+  general: Harald
+  isPrimary: true
+  name: Harald - fully maxed
+  targetType: mayor

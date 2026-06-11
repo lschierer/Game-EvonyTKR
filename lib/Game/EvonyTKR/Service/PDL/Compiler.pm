@@ -136,6 +136,47 @@ has 'cache_helper' => (
   },
 );
 
+# Model loaders and conflict service for generic book selection.
+# Lazy: only built the first time a generic book row is compiled.
+has '_model_books_loader' => (
+  is      => 'ro',
+  lazy    => 1,
+  default => sub ($self) {
+    require Game::EvonyTKR::Loader::Books;
+    my $loader =
+      Game::EvonyTKR::Loader::Books->new(data_dir => $self->data_dir);
+    $loader->load_all;
+    return $loader;
+  },
+);
+
+has '_model_generals_loader' => (
+  is      => 'ro',
+  lazy    => 1,
+  default => sub ($self) {
+    require Game::EvonyTKR::Loader::Generals;
+    require Path::Tiny;
+    my $loader = Game::EvonyTKR::Loader::Generals->new(
+      data_dir => Path::Tiny::path($self->data_dir, 'generals')->stringify);
+    $loader->load_all;
+    return $loader;
+  },
+);
+
+has '_conflicts_service' => (
+  is      => 'ro',
+  lazy    => 1,
+  default => sub {
+    require Game::EvonyTKR::Service::Conflicts;
+    return Game::EvonyTKR::Service::Conflicts->new;
+  },
+);
+
+has '_general_model_cache' => (
+  is      => 'ro',
+  default => sub { {} },
+);
+
 =head2 compile_general
 
   my $compiled = $compiler->compile_general($general_name, $activation_type);
@@ -334,7 +375,8 @@ sub _get_troop_type ($self, $type_array) {
 sub _is_wall_duplicate ($self, $seen, $scope, $buff, $is_debuff, $troop_type) {
   return 0 unless $troop_type eq 'wall' && !$is_debuff;
   return 0
-    unless ($buff->{targetedType} // '') =~ /ground|mounted|ranged|siege/i;
+    unless $self->_buff_targeted_type($buff) =~
+    /ground|mounted|ranged|siege/i;
   my $sig = join "\x1f", $scope, lc($buff->{attribute} // ''),
     ($buff->{value}{number} // 0),
     sort @{ $buff->{conditions} || [] };
@@ -576,8 +618,34 @@ sub _select_best_generic_books_simple ($self, $general, $activation_type,
     $book_count    = 3;
     $book_level_num = $book_level =~ /(\d+)/ ? $1 : 4;
   }
-  $book_count = scalar @sorted_book_names if $book_count > scalar @sorted_book_names;
-  my @selected_books = @sorted_book_names[0 .. ($book_count - 1)];
+# Walk the ranked pool skipping books that conflict with the general's
+# built-in book, taking the first $book_count compatible ones. A general only
+# gets 3 generic books in game; the ranked pool exists so a conflict with a
+# top book falls through to the next one (e.g. Aethelflaed conflicts with the
+# Against-Monster attack book and takes the plain attack book instead).
+  my $general_model = $self->_general_model($general_name);
+  my @selected_books;
+  foreach my $book_name (@sorted_book_names) {
+    last if scalar @selected_books >= $book_count;
+    my $base_name = $book_name =~ s/^Level \d+ //r;
+    if ($general_model) {
+      my $book_model = $self->_model_books_loader->get_generic_book(
+        sprintf('%s (level %d)', $base_name, $book_level_num));
+      if ($book_model) {
+        my $compatible =
+          $self->_conflicts_service->is_general_and_book_compatible(
+          $general_model, $book_model, { delta_threshold => 15 });
+        unless ($compatible) {
+          $self->log->debug(sprintf(
+            'Skipping generic book "%s" for %s: conflicts with built-in book',
+            $book_name, $general_name
+          ));
+          next;
+        }
+      }
+    }
+    push @selected_books, $book_name;
+  }
 
 # Load and sum buffs from selected books
 # Note: Generic book filenames include the level (e.g., "Level 4 Ground Troop Attack.yaml")
@@ -625,6 +693,39 @@ sub _select_best_generic_books_simple ($self, $general, $activation_type,
   return \%buffs;
 }
 
+# Model::General with inflated builtInBook, for conflict checks. Returns
+# undef (and selection proceeds unfiltered) when the general or book cannot
+# be resolved, so partial test datasets do not die here.
+sub _general_model ($self, $general_name) {
+  my $cache = $self->_general_model_cache;
+  return $cache->{$general_name} if exists $cache->{$general_name};
+
+  my $model = eval {
+    my $g = $self->_model_generals_loader->get_general(
+      $self->normalize($general_name));
+    return undef unless $g;
+    if (!$g->builtInBook && $g->builtInBookName) {
+      my $book =
+        $self->_model_books_loader->get_skill_book($g->builtInBookName);
+      $g->builtInBook($book) if $book;
+    }
+    $g->builtInBook ? $g : undef;
+  };
+  if ($@) {
+    $self->log->warn(
+      "Could not build general model for '$general_name': $@");
+    $model = undef;
+  }
+  unless ($model) {
+    $self->log->warn(sprintf(
+      'No general model with built-in book for "%s"; '
+        . 'generic book selection will not be conflict-filtered',
+      $general_name
+    ));
+  }
+  return $cache->{$general_name} = $model;
+}
+
 sub _buff_applies ($self, $buff, $activation_type, $troop_type) {
   my $conditions = $buff->{conditions} || [];
 
@@ -660,9 +761,18 @@ sub _buff_applies ($self, $buff, $activation_type, $troop_type) {
   return 0;
 }
 
+# Data files spell the troop-targeting field four ways: targetedType,
+# targetedTroops (array), troop, and class. Model::Buff::from_hash handles
+# the first three; raw-YAML consumers like this compiler must accept all.
+sub _buff_targeted_type ($self, $buff) {
+  my $tt = $buff->{targetedType} // $buff->{targetedTroops} // $buff->{troop}
+    // $buff->{class} // '';
+  return ref $tt eq 'ARRAY' ? join(', ', @$tt) : $tt;
+}
+
 sub _get_buff_column_key ($self, $buff, $is_debuff = 0, $troop_type = '') {
   my $attribute     = lc($buff->{attribute} || '');
-  my $targeted_type = $buff->{targetedType} || '';
+  my $targeted_type = $self->_buff_targeted_type($buff);
 
   # Normalize attribute names
   $attribute =~ s/\s+/_/g;

@@ -9,6 +9,7 @@ use PDL;
 use PDL::NiceSlice;
 use YAML::XS qw(LoadFile);
 use Game::EvonyTKR::Service::PDL::Compiler;
+use Game::EvonyTKR::Service::PDL::Runtime;
 
 =head1 NAME
 
@@ -32,6 +33,12 @@ my $compiler = Game::EvonyTKR::Service::PDL::Compiler->new(
   data_dir => 'share/collections/data'
 );
 
+# Runtime provides the real mask/multiply logic; the test must not
+# reimplement it (an earlier copy here had a wrong ascending ladder).
+my $runtime = Game::EvonyTKR::Service::PDL::Runtime->new(
+  data_dir => 'share/collections/data'
+);
+
 for my $test_case (@{$golden_data->{test_cases}}) {
   my $name = $test_case->{name};
   my $general_name = $test_case->{general};
@@ -47,8 +54,8 @@ for my $test_case (@{$golden_data->{test_cases}}) {
       return;
     };
 
-    my $mask = build_filter_mask($compiled, $filters);
-    my $buff_vector = compute_buffs($compiled, $mask);
+    my $mask = $runtime->build_filter_mask($compiled, $filters);
+    my $buff_vector = $runtime->matrix_multiply($compiled, $mask);
 
     # Check expected buffs
     for my $troop_type (sort keys %$expected_buffs) {
@@ -115,64 +122,6 @@ for my $test_case (@{$golden_data->{test_cases}}) {
 }
 
 done_testing;
-
-sub build_filter_mask ($compiled, $filters) {
-  my @mask;
-  my $row_labels = $compiled->{row_labels};
-
-  for my $i (0 .. $#{$row_labels}) {
-    my $label = $row_labels->[$i];
-    my $active = 0;
-
-    if ($label eq 'book') {
-      $active = 1;
-    }
-    elsif ($label =~ /^asc_(.+)$/) {
-      my $level = $1;
-      my $selected = $filters->{ascendingLevel} || 'none';
-      $active = is_ascending_active($level, $selected);
-    }
-    elsif ($label =~ /^cov_(.+)$/) {
-      my $level = $1;
-      my $selected = lc($filters->{covenantLevel} || 'none');
-      $active = (lc($level) eq $selected) ? 1 : 0;
-    }
-    elsif ($label =~ /^spec(\d+)_(.+)$/) {
-      my $slot = $1;
-      my $level = $2;
-      my $selected = lc($filters->{"specialty$slot"} || 'none');
-      $active = (lc($level) eq $selected) ? 1 : 0;
-    }
-    elsif ($label =~ /^generic_(.+)$/) {
-      my $level = $1;
-      my $selected = lc($filters->{generic1} || 'none');
-      $active = (lc($level) eq $selected) ? 1 : 0;
-    }
-
-    push @mask, $active;
-  }
-
-  return pdl(@mask);
-}
-
-sub is_ascending_active ($level, $selected) {
-  my @levels = qw(none red1 red2 red3 red4 red5 orange1 orange2 orange3 orange4 orange5);
-  my %level_num = map { $levels[$_] => $_ } 0 .. $#levels;
-
-  my $level_idx = $level_num{$level} // 0;
-  my $selected_idx = $level_num{$selected} // 0;
-
-  return $level_idx > 0 && $level_idx <= $selected_idx ? 1 : 0;
-}
-
-sub compute_buffs ($compiled, $mask) {
-  my $matrix = $compiled->{matrix};
-  my $mask_1d = $mask->flat;
-  my $mask_col = $mask_1d->reshape($mask_1d->nelem, 1);
-  my $masked_matrix = $matrix * $mask_col;
-  my $result = sumover($masked_matrix);
-  return $result;
-}
 
 sub get_troop_suffix ($troop_type) {
   return 'ground' if $troop_type =~ /ground/i;

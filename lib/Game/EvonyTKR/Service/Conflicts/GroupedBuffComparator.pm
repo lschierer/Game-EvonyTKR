@@ -4,7 +4,7 @@ use utf8::all;
 use Moo;
 use List::AllUtils qw( any uniq );
 
-has 'service';    # parent service for constants
+has 'service' => (is => 'rw');    # parent service for constants
 
 # Detect conflicts between generals with grouped buffs
 sub conflicts ($self, $g1, $g2) {

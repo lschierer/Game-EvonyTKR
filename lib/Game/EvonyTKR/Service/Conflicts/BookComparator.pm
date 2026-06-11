@@ -5,7 +5,7 @@ use Moo;
 use List::AllUtils qw( any uniq );
 use Scalar::Util   qw( refaddr );
 
-has 'service';    # parent service for constants
+has 'service' => (is => 'rw');    # parent service for constants
 
 # Compare generic book against general's builtin book
 # Returns: 0 = compatible, 1 = partial conflict, 2 = full conflict
