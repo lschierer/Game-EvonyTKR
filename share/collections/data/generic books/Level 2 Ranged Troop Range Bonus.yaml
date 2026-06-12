@@ -4,6 +4,6 @@ text: >-
   Increases Ranged Troop’s Attack Range by 50% when General is leading the army.
 buffs:
   - attribute: Range
-    troops: Ranged Troops
+    targetedType: Ranged Troops
     value:
       number: 50

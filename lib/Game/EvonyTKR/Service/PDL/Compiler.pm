@@ -761,12 +761,14 @@ sub _buff_applies ($self, $buff, $activation_type, $troop_type) {
   return 0;
 }
 
-# Data files spell the troop-targeting field four ways: targetedType,
-# targetedTroops (array), troop, and class. Model::Buff::from_hash handles
-# the first three; raw-YAML consumers like this compiler must accept all.
+# Data files have spelled the troop-targeting field five ways: targetedType
+# (canonical), targetedTroops (array), troop, troops, and class. The data is
+# normalized to targetedType, but raw-YAML consumers keep accepting all
+# variants so a stray reintroduction degrades loudly in review, not silently
+# into the all-troops bucket.
 sub _buff_targeted_type ($self, $buff) {
   my $tt = $buff->{targetedType} // $buff->{targetedTroops} // $buff->{troop}
-    // $buff->{class} // '';
+    // $buff->{troops} // $buff->{class} // '';
   return ref $tt eq 'ARRAY' ? join(', ', @$tt) : $tt;
 }
 

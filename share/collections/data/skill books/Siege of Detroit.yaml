@@ -3,25 +3,25 @@ text: >-
   Increases in-city ground troops and mounted troops’ attack and HP by 30%, and in-city ground troops’ attack and defense by 20% when General is the Main City Defense General.
 buffs:
   - attribute: Attack
-    troops: Ground Troops
+    targetedType: Ground Troops
     conditions:
       - In City
     value:
       number: 30
   - attribute: Attack
-    troops: Mounted Troops
+    targetedType: Mounted Troops
     conditions:
       - In City
     value:
       number: 30
   - attribute: HP
-    troops: Ground Troops
+    targetedType: Ground Troops
     conditions:
       - In City
     value:
       number: 30
   - attribute: HP
-    troops: Mounted Troops
+    targetedType: Mounted Troops
     conditions:
       - In City
     value:

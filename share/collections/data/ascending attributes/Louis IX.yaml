@@ -3,17 +3,17 @@ ascending:
   - level: red1
     buffs:
       - attribute: Attack
-        troops: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        troops: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        troops: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
@@ -28,7 +28,7 @@ ascending:
   - level: red3
     buffs:
       - attribute: HP
-        troops: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 15
           unit: percentage
@@ -41,34 +41,34 @@ ascending:
   - level: red4
     buffs:
       - attribute: Defense
-        troops: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 15
           unit: percentage
       - attribute: Defense
-        troops: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 15
           unit: percentage
       - attribute: HP
-        troops: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 15
           unit: percentage
       - attribute: HP
-        troops: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 15
           unit: percentage
   - level: red5
     buffs:
       - attribute: Attack
-        troops: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 30
           unit: percentage
       - attribute: Defense
-        troops: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 15
           unit: percentage

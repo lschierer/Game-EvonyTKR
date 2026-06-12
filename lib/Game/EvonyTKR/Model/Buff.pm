@@ -455,6 +455,11 @@ package Game::EvonyTKR::Model::Buff {
         sprintf('found class in hashref: "%s"', $hashref->{class}));
       $r->set_target($hashref->{class});
     }
+    if (exists $hashref->{troops}) {
+      $logger->debug(
+        sprintf('found troops in hashref: "%s"', $hashref->{troops}));
+      $r->set_target($hashref->{troops});
+    }
     if (exists $hashref->{condition}) {
       foreach my $c (@{ $hashref->{conditions} }) {
         $r->set_condition($c);
