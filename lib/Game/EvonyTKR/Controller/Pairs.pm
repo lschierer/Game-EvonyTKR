@@ -367,7 +367,7 @@ qr/(?:ground_specialist|mounted_specialist|ranged_specialist|siege_specialist|ma
     # Get pairs from loader
     my $pairs_loader = $self->pairs_loader();
     unless ($pairs_loader) {
-      return await $ctx->res->json({
+      return $ctx->res->json({
         error     => 'Pairs data not loaded',
         sessionId => '',
         selected  => []
@@ -379,7 +379,7 @@ qr/(?:ground_specialist|mounted_specialist|ranged_specialist|siege_specialist|ma
 
     if (scalar(@$all_pairs) == 0) {
       $self->logger->warn("No pairs found for type: $type");
-      return await $ctx->res->json({
+      return $ctx->res->json({
         error     => 'No pairs available for this type',
         sessionId => '',
         selected  => []
@@ -417,7 +417,7 @@ qr/(?:ground_specialist|mounted_specialist|ranged_specialist|siege_specialist|ma
     );
 
     # Return catalog response
-    return await $ctx->res->json({
+    return $ctx->res->json({
       sessionId => $session_id,
       selected  => \@filtered_pairs,
     });

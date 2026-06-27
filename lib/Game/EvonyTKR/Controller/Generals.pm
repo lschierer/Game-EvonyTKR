@@ -733,7 +733,7 @@ package Game::EvonyTKR::Controller::Generals {
     );
 
     # Return catalog response
-    return await $ctx->res->json({
+    return $ctx->res->json({
       sessionId => $session_id,
       selected  => \@selected,
     });
