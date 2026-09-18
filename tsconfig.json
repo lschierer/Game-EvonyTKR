@@ -19,8 +19,7 @@
     "forceConsistentCasingInFileNames": true,
     "types": [
       "node",
-      "./types/myGlobals.d.ts",
-      "./types/postcss-extend.d.ts"
+      "./types/myGlobals.d.ts"
     ],
     "noEmit": true,
     "composite": true,
@@ -34,5 +33,16 @@
     "./scripts/*.ts",
     "./infrastructure/**/*.ts",
     "./types/**/*.ts"
+  ],
+  // This project is composite, so every file in its program must be matched by the
+  // include patterns above - and scripts/ imports two files out of the framework
+  // (lib/Infrastructure/index.ts and scripts/build-css.ts). Without the reference
+  // those imports drag framework SOURCE into this program, which is both outside
+  // rootDir (TS6059) and unlisted (TS6307). With it, TypeScript redirects them to
+  // the framework's built declarations in its dist/ instead, so they are no longer
+  // inputs here. tsc on the command line missed this because tsconfig.build.json
+  // does not include scripts/; the editors use THIS file and so they did not.
+  "references": [
+    {"path": "../PAGI-WebServer"}
   ]
 }
