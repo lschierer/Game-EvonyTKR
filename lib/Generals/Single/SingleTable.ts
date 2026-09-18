@@ -21,25 +21,31 @@ import GeneralTableCSS from '../../../share/public/css/GeneralTable.css' with { 
 import {
   createSortedRowModel,
   rowSortingFeature,
-  sortFns,
+  sortFn_alphanumeric,
+  sortFn_text,
   tableFeatures,
   TableController,
   type ColumnDef,
   type SortingState,
   type CellContext,
   type HeaderContext,
-  type Table,
+  type LitTable,
   flexRender,
 } from '@tanstack/lit-table';
 
 import type * as data from './data';
 import type { SingleGeneralState } from '../GeneralRowSchemas';
 
-const features = tableFeatures({ rowSortingFeature });
+// Only the sort fns reachable by auto-detection for this data are registered:
+// name columns resolve to alphanumeric/text, numeric buffs fall back to the
+// built-in basic sort. Registering individually keeps unused ones out of the
+// bundle.
+const features = tableFeatures({
+  rowSortingFeature,
+  sortedRowModel: createSortedRowModel(),
+  sortFns: { alphanumeric: sortFn_alphanumeric, text: sortFn_text },
+});
 type Features = typeof features;
-const rowModels = {
-  sortedRowModel: createSortedRowModel<Features, SingleGeneralState>(sortFns),
-};
 
 const tableHeaders = new Map<string, string>([
   ['primary', 'Primary'],
@@ -70,7 +76,7 @@ export class SingleTable extends LitElement {
   @state() private _sorting: SortingState = [];
   @state() private columns: ColumnDef<Features, SingleGeneralState>[] = [];
 
-  private table?: Table<Features, SingleGeneralState>;
+  private table?: LitTable<Features, SingleGeneralState>;
   @state() private tableData: SingleGeneralState[] = [];
   private tableController = new TableController<Features, SingleGeneralState>(
     this,
@@ -119,7 +125,6 @@ export class SingleTable extends LitElement {
           id: 'rowIndex',
           header: '#',
           enableSorting: false,
-          meta: { isIndex: true }, // handy flag for render branch
         },
       ];
 
@@ -164,9 +169,7 @@ export class SingleTable extends LitElement {
                 : (value ?? '');
             },
             header: (info: HeaderContext<Features, SingleGeneralState>) => {
-              const sortIndex = info.table.store.state.sorting.findIndex(
-                (s) => s.id === info.column.id,
-              );
+              const sortIndex = info.column.getSortIndex();
               const direction = info.column.getIsSorted();
               const showArrow =
                 direction === 'asc' ? '🔼' : direction === 'desc' ? '🔽' : '';
@@ -221,7 +224,6 @@ export class SingleTable extends LitElement {
 
     this.table = this.tableController.table({
       features,
-      rowModels,
       columns: this.columns,
       data: this.tableData,
       state: { sorting: this._sorting },

@@ -3,8 +3,8 @@ jq = "latest"
 node = "24"
 pandoc = "latest"
 perl = "latest"
-pnpm = "11"
-python = "latest"
+pnpm = "12"
+python = "3.14.7"
 watchexec = "latest"
 yq = "latest"
 
@@ -85,9 +85,14 @@ mkdir -p share/public/types
 pnpm build:ts
 """
 
+[tasks.lint]
+description = "Lint TypeScript"
+depends = ["npmdeps"]
+run = "pnpm lint"
+
 [tasks.build]
 description = "Full build"
-depends = ["prepare", "deps", "css", "images", "ts"]
+depends = ["prepare", "deps", "css", "images", "lint", "ts"]
 run = """
 ./Build manifest
 ./Build

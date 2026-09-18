@@ -137,7 +137,6 @@ export class PairFilter extends LitElement {
   }
 
   protected override updated(_changedProperties: PropertyValues): void {
-    void _changedProperties;
     if (DEBUG) {
       console.log(
         `${this.is_primary ? 'primary' : 'secondary'} filter updated`,
